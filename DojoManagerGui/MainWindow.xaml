@@ -1,0 +1,44 @@
+﻿<mah:MetroWindow x:Class="DojoManagerGui.MainWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                 xmlns:ViewModels="clr-namespace:DojoManagerGui.ViewModels" 
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"  
+                 Title="DojoManager"
+                 Height="600"
+                 Width="800"
+                 >
+    <mah:MetroWindow.Resources>
+        <ViewModels:VM_MainWindow x:Key="vm"/>
+    </mah:MetroWindow.Resources>
+    <Grid DataContext="{StaticResource vm}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" ></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+
+        <Border BorderThickness="0,0,1,0" BorderBrush="DeepSkyBlue">
+            <ListBox x:Name="Functions" 
+                 Width="Auto" Margin="5"  
+                 ItemsSource="{Binding FunctionPages}"  
+                     SelectedItem="{Binding FunctionSelected}"
+                 DisplayMemberPath="Name"  />
+
+        </Border>
+        <ContentControl Grid.Column="1" Content="{Binding FunctionSelected}" >
+            <ContentControl.Resources>
+                <DataTemplate DataType="{x:Type ViewModels:VM_ListAssociates}">
+                    <DataGrid ItemsSource="{Binding Members}" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn IsReadOnly="True" Header="Nome" Binding="{Binding Person.Name}"></DataGridTextColumn>
+                            <DataGridTextColumn IsReadOnly="True" Header="Iscrizione" Binding="{Binding CertiFicateExpiration, StringFormat=d}"></DataGridTextColumn>
+                            <DataGridTextColumn IsReadOnly="True" Header="Scad. Cert." Binding="{Binding CertiFicateExpiration, StringFormat=d}"></DataGridTextColumn>
+                            <DataGridTextColumn IsReadOnly="True" Header="Debiti" Binding="{Binding Debit}"></DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DataTemplate>
+            </ContentControl.Resources>
+        </ContentControl>
+
+    </Grid>
+</mah:MetroWindow>
