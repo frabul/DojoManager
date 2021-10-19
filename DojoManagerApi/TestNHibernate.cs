@@ -1,4 +1,5 @@
 ﻿using DojoManagerApi.Entities;
+using FluentNHibernate;
 using FluentNHibernate.Automapping;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
@@ -16,6 +17,10 @@ using System.Threading.Tasks;
 
 namespace DojoManagerApi
 {
+    public class AutomapIgnoreAttribute : Attribute
+    {
+
+    }
     public class TestNHibernate
     {
         public ISessionFactory sessionFactory { get; private set; }
@@ -26,7 +31,13 @@ namespace DojoManagerApi
         {
             public override bool ShouldMap(Type type)
             {
-                return !type.FullName.Contains('+') && type.Namespace == "DojoManagerApi.Entities" && !type.IsEnum; ;
+                var ignoreByAttribute = type.GetCustomAttributes(typeof(AutomapIgnoreAttribute), true).Any();
+                return !ignoreByAttribute && !type.FullName.Contains('+') && type.Namespace == "DojoManagerApi.Entities" && !type.IsEnum    ;
+            }
+            public override bool ShouldMap(Member member)
+            {
+                var ignoreByAttribute = member.MemberInfo.GetCustomAttributes(typeof(AutomapIgnoreAttribute), true).Any();
+                return !ignoreByAttribute && base.ShouldMap(member);
             }
             public override bool IsComponent(Type type)
             {
@@ -43,7 +54,8 @@ namespace DojoManagerApi
                             .Database(SQLiteConfiguration.Standard.UsingFile("KenseiDojoDb.db"))
                             .Mappings(m =>
                                      m.AutoMappings.Add(autoMaps)
-                                    .ExportTo(@"D:\ProgettiBck\DojoManager\DojoManager\bin\Debug\net5.0\"))
+                                    .ExportTo(@".\")
+                                    )
                             .ExposeConfiguration(BuildSchema)
                             .BuildSessionFactory();
             sess = sessionFactory.OpenSession();

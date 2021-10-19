@@ -1,7 +1,9 @@
-﻿using DojoManagerApi.Entities;
+﻿using DojoManagerApi;
+using DojoManagerApi.Entities;
 using DojoManagerGui.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 using System.Data;
 using System.Linq;
@@ -20,9 +22,13 @@ namespace DojoManagerGui
         {
             Db = new DojoManagerApi.TestNHibernate();
             Db.Initialize();
-             
-            var decorated = EntitiesViewModelProxy<IPerson>.Create(Db.ListPersons().First());
-           
+            //var decorated = EntitiesViewModelProxy<IDebit>.Create(Db.ListPersons().SelectMany(p => p.Debits).FirstOrDefault() );
+            var persons = Db.ListPersons();
+            var proxy = (Person)EntityWrapper.Wrap(persons.First(), typeof(Person));
+            (proxy as INotifyPropertyChanged).PropertyChanged +=
+                (s, e) => 
+                    Console.WriteLine($"{e} has changed.");
+            proxy.Name = "asdasdasdasd";
             MainWindow window = new MainWindow(); 
             window.Show();
 

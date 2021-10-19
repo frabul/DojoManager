@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace DojoManagerGui.ViewModels
 {
-    public class VM_Address
+    public class VM_Address : INotifyPropertyChanged
     {
         public string City { get; set; }
         public string Street { get; set; }
         public int Number { get; set; }
         public string PostCode { get; set; }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
     }
     public class VM_JuridicalEntity
     {

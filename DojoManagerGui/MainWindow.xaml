@@ -25,20 +25,13 @@
                  DisplayMemberPath="Name"  />
 
         </Border>
-        <ContentControl Grid.Column="1" Content="{Binding FunctionSelected}" >
+        <mah:MetroContentControl Grid.Column="1" Content="{Binding FunctionSelected}" >
             <ContentControl.Resources>
                 <DataTemplate DataType="{x:Type ViewModels:VM_ListAssociates}">
-                    <DataGrid ItemsSource="{Binding Members}" AutoGenerateColumns="False">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn IsReadOnly="True" Header="Nome" Binding="{Binding Person.Name}"></DataGridTextColumn>
-                            <DataGridTextColumn IsReadOnly="True" Header="Iscrizione" Binding="{Binding CertiFicateExpiration, StringFormat=d}"></DataGridTextColumn>
-                            <DataGridTextColumn IsReadOnly="True" Header="Scad. Cert." Binding="{Binding CertiFicateExpiration, StringFormat=d}"></DataGridTextColumn>
-                            <DataGridTextColumn IsReadOnly="True" Header="Debiti" Binding="{Binding Debit}"></DataGridTextColumn>
-                        </DataGrid.Columns>
-                    </DataGrid>
+                    
                 </DataTemplate>
             </ContentControl.Resources>
-        </ContentControl>
+        </mah:MetroContentControl>
 
     </Grid>
 </mah:MetroWindow>

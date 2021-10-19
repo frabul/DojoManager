@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\FluentIL\src\FluentIL\FluentIL.csproj" />
     <ProjectReference Include="..\DojoManagerApi\DojoManagerApi.csproj" />
   </ItemGroup>
 

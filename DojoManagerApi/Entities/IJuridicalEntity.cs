@@ -1,5 +1,6 @@
 ﻿namespace DojoManagerApi.Entities
 {
+
     public interface IJuridicalEntity
     {
         Address Address { get; set; }
