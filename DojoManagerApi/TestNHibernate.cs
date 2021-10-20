@@ -21,57 +21,66 @@ namespace DojoManagerApi
     {
 
     }
+    public class SqlStatementInterceptor : EmptyInterceptor
+    {
+        public override NHibernate.SqlCommand.SqlString OnPrepareStatement(NHibernate.SqlCommand.SqlString sql)
+        {
+            Console.WriteLine();
+            Console.WriteLine(sql.ToString());
+            return sql;
+        }
+    
+    }
+    public class StoreConfiguration : DefaultAutomappingConfiguration
+    {
+        public override bool ShouldMap(Type type)
+        {
+            var ignoreByAttribute = type.GetCustomAttributes(typeof(AutomapIgnoreAttribute), true).Any();
+            return !ignoreByAttribute && !type.FullName.Contains('+') && type.Namespace == "DojoManagerApi.Entities" && !type.IsEnum;
+        }
+        public override bool ShouldMap(Member member)
+        {
+            var ignoreByAttribute = member.MemberInfo.GetCustomAttributes(typeof(AutomapIgnoreAttribute), true).Any();
+            return !ignoreByAttribute && base.ShouldMap(member);
+        }
+        public override bool IsComponent(Type type)
+        {
+            return type == typeof(Address);
+        }
+    }
+
     public class TestNHibernate
     {
         public ISessionFactory sessionFactory { get; private set; }
+        public string DbFile { get; private set; } = "KenseiDojoDb.db";
 
-        private ISession sess;
+        public ISession currentSession;
 
-        public class StoreConfiguration : DefaultAutomappingConfiguration
+
+        public void Close()
         {
-            public override bool ShouldMap(Type type)
-            {
-                var ignoreByAttribute = type.GetCustomAttributes(typeof(AutomapIgnoreAttribute), true).Any();
-                return !ignoreByAttribute && !type.FullName.Contains('+') && type.Namespace == "DojoManagerApi.Entities" && !type.IsEnum    ;
-            }
-            public override bool ShouldMap(Member member)
-            {
-                var ignoreByAttribute = member.MemberInfo.GetCustomAttributes(typeof(AutomapIgnoreAttribute), true).Any();
-                return !ignoreByAttribute && base.ShouldMap(member);
-            }
-            public override bool IsComponent(Type type)
-            {
-                return type == typeof(Address);
-            }
+            currentSession?.Dispose();
+            sessionFactory?.Dispose();
         }
+
         public void Initialize()
         {
+            Close();
             var cfg = new StoreConfiguration();
             var autoMaps =
                 AutoMap.AssemblyOf<TestNHibernate>(cfg)
-                        .Conventions.Add(DefaultCascade.SaveUpdate());
+                        .Conventions.Add(DefaultCascade.All());
             sessionFactory = Fluently.Configure()
-                            .Database(SQLiteConfiguration.Standard.UsingFile("KenseiDojoDb.db"))
+                            .Database(SQLiteConfiguration.Standard.UsingFile(DbFile))
                             .Mappings(m =>
                                      m.AutoMappings.Add(autoMaps)
                                     .ExportTo(@".\")
                                     )
                             .ExposeConfiguration(BuildSchema)
                             .BuildSessionFactory();
-            sess = sessionFactory.OpenSession();
-        }
-        public void Test()
-        {
-            Initialize();
-            Populate();
-            PrintPersons();
 
-            //----- printing persons again ----
-            var persons = ListPersons();
-            foreach (var p in persons)
-                Console.WriteLine(p.TestPrint());
+            currentSession = sessionFactory.OpenSession();
         }
-
         private static void BuildSchema(Configuration config)
         {
             // delete the existing db on each run
@@ -88,12 +97,33 @@ namespace DojoManagerApi
             {
                 new SchemaUpdate(config).Execute(true, true);
             }
+            config.SetInterceptor(new SqlStatementInterceptor());
+        }
+
+        public void Test(bool delete)
+        {
+            if (delete)
+                DeleteDb();
+            Initialize();
+            Populate();
+            PrintPersons();
+
+            //----- printing persons again ----
+            var persons = ListPersons();
+            foreach (var p in persons)
+                Console.WriteLine(p.TestPrint());
+        }
+
+        public void DeleteDb()
+        {
+            if (File.Exists(DbFile))
+                File.Delete(DbFile);
         }
 
         public IEnumerable<Person> ListPersons()
         {
 
-            var persons = sess.Query<Person>().ToList();
+            var persons = currentSession.Query<Person>().ToList();
 
             return persons;
 
@@ -104,7 +134,7 @@ namespace DojoManagerApi
         public void Populate()
         {
 
-            using (var transact = sess.BeginTransaction())
+            using (var transact = currentSession.BeginTransaction())
             {
                 var p1 = new Person
                 {
@@ -115,13 +145,13 @@ namespace DojoManagerApi
                     PhoneNumber = "166101010"
                 };
                 p1.AddCertificate(new Certificate { Expiry = DateTime.Now.AddMonths(7), IsCompetitive = true });
-                var deb1 = p1.AddSubscription(new Subscription() { StartDate = Date(2021, 10), EndDate = Date(2022, 08), Type = SubscriptionType.Kensei_Dojo_Annual_Association }, 360);
-                var deb2 = p1.AddSubscription(new Subscription() { StartDate = Date(2021, 01), EndDate = Date(2022, 01), Type = SubscriptionType.CIK_Annual_Association, Notes = "Prima iscrizione" }, 25);
+                var deb1 = p1.AddSubscription(new Subscription() { StartDate = Date(2021, 10), EndDate = Date(2022, 08), Type = SubscriptionType.Kensei_Dojo_Annual_Association, Notes = "Sec iscrizione" }, 360);
+                var deb2 = p1.AddSubscription(new Subscription() { StartDate = Date(2020, 01), EndDate = Date(2021, 01), Type = SubscriptionType.CIK_Annual_Association, Notes = "Prima iscrizione" }, 25);
                 deb1.AddPayment(new DebitPayment() { Amount = 360 });
 
-                sess.SaveOrUpdate(deb1);
-                sess.SaveOrUpdate(deb2);
-                sess.SaveOrUpdate(p1);
+                currentSession.SaveOrUpdate(deb1);
+                currentSession.SaveOrUpdate(deb2);
+                currentSession.SaveOrUpdate(p1);
 
 
                 var p2 = new Person
@@ -134,18 +164,18 @@ namespace DojoManagerApi
                 };
                 p2.AddCertificate(new Certificate { Expiry = DateTime.Now.AddMonths(-14), IsCompetitive = false });
                 p2.AddCertificate(new Certificate { Expiry = DateTime.Now.AddMonths(-2), IsCompetitive = true });
-                var deb3 = p2.AddSubscription(new Subscription() { StartDate = Date(2020, 10), EndDate = Date(2021, 08), Type = SubscriptionType.Kensei_Dojo_Annual_Association }, 400);
-                var deb4 = p2.AddSubscription(new Subscription() { StartDate = Date(2021, 09), EndDate = Date(2022, 08), Type = SubscriptionType.Kensei_Dojo_Annual_Association }, 360);
-                var deb5 = p2.AddSubscription(new Subscription() { StartDate = Date(2021, 01), EndDate = Date(2022, 01), Type = SubscriptionType.CIK_Annual_Association, Notes = "Prima iscrizione" }, 25);
+                var deb3 = p2.AddSubscription(new Subscription() { StartDate = Date(2020, 10), EndDate = Date(2021, 08), Type = SubscriptionType.Kensei_Dojo_Annual_Association, Notes = "Prima iscrizione" }, 400);
+                var deb4 = p2.AddSubscription(new Subscription() { StartDate = Date(2021, 09), EndDate = Date(2022, 08), Type = SubscriptionType.Kensei_Dojo_Annual_Association, Notes = "Sec iscrizione" }, 360);
+                var deb5 = p2.AddSubscription(new Subscription() { StartDate = Date(2021, 01), EndDate = Date(2022, 01), Type = SubscriptionType.CIK_Annual_Association, Notes = "CIK" }, 25);
                 deb3.AddPayment(new DebitPayment() { Amount = 400 });
-                sess.SaveOrUpdate(deb3);
-                sess.SaveOrUpdate(deb4);
-                sess.SaveOrUpdate(deb5);
+                currentSession.SaveOrUpdate(deb3);
+                currentSession.SaveOrUpdate(deb4);
+                currentSession.SaveOrUpdate(deb5);
 
-                sess.SaveOrUpdate(p2);
+                currentSession.SaveOrUpdate(p2);
 
                 var of = new CashFlow() { Amount = 100, Date = DateTime.Now, Direction = CashFlowDirection.Out, Notes = "affitto agosto" };
-                sess.SaveOrUpdate(of);
+                currentSession.SaveOrUpdate(of);
 
                 transact.Commit();
             }
@@ -153,10 +183,14 @@ namespace DojoManagerApi
         }
 
         public void PrintPersons()
-        { 
-            var persons = sess.Query<Person>().ToList();
+        {
+            var persons = currentSession.Query<Person>().ToList();
             foreach (var pers in persons)
-                Console.WriteLine(pers.ToString()); 
+                Console.WriteLine(pers.TestPrint());
+        }
+        public void Flush()
+        {
+            currentSession.Flush();
         }
     }
 

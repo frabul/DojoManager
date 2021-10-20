@@ -2,7 +2,8 @@
 
 namespace DojoManagerApi 
 {
-    public class EntityInterfaceAttribute : Attribute
+   
+    public class WrapMeAttribute : Attribute
     {
 
     }

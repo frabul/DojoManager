@@ -24,7 +24,7 @@ namespace DojoManagerGui
             Db.Initialize();
             //var decorated = EntitiesViewModelProxy<IDebit>.Create(Db.ListPersons().SelectMany(p => p.Debits).FirstOrDefault() );
             var persons = Db.ListPersons();
-            var proxy = (Person)EntityWrapper.Wrap(persons.First(), typeof(Person));
+            var proxy = (Person)EntityWrapper.Wrap(persons.First() );
             (proxy as INotifyPropertyChanged).PropertyChanged +=
                 (s, e) => 
                     Console.WriteLine($"{e} has changed.");

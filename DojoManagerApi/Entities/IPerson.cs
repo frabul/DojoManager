@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace DojoManagerApi.Entities
 {
-    [EntityInterface]
+    [WrapMe]
     public interface IPerson : IJuridicalEntity
     {
         DateTime BirthDate { get; set; }

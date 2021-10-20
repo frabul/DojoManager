@@ -2,6 +2,7 @@
 
 namespace DojoManagerApi.Entities
 {
+    [WrapMe]
     public class Debit : IDebit
     {
         public virtual int Id { get; set; }

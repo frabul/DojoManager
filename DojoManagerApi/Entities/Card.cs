@@ -3,7 +3,7 @@
 namespace DojoManagerApi.Entities
 {
     public enum CardType { Unnown, Kensei, CIK }
-
+    [WrapMe]
     public class Card
     {
         public virtual int Id { get; set; }

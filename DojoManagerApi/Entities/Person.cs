@@ -4,6 +4,11 @@ using System.Linq;
 
 namespace DojoManagerApi.Entities
 {
+    public class PersonDummy : Person
+    {
+
+    }
+    [WrapMe]
     public class Person : JuridicalEntity, IPerson
     {
         public virtual DateTime BirthDate { get; set; }
@@ -24,10 +29,11 @@ namespace DojoManagerApi.Entities
 
         public virtual Debit AddSubscription(Subscription subscription, int cost)
         {
-            Subscriptions.Add(subscription);
-            subscription.Person = this;
             var deb = new Debit() { Amount = cost, Person = this, Subscription = subscription };
-            this.Debits.Add(deb);
+            subscription.Debit = deb;
+            subscription.Person = this;
+            Subscriptions.Add(subscription);
+            this.Debits.Add(deb); 
             return deb;
         }
 

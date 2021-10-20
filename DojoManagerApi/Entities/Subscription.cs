@@ -2,6 +2,7 @@
 
 namespace DojoManagerApi.Entities
 {
+    [WrapMe]
     public class Subscription : ISubscription
     {
         public virtual int Id { get; set; }
@@ -14,7 +15,7 @@ namespace DojoManagerApi.Entities
         public virtual DateTime EndDate { get; set; }
 
         [AutomapIgnore]
-        public virtual decimal Cost { get => Debit.Amount; set => Debit.Amount = value; }
+        public virtual decimal Cost { get => Debit.Amount; set { if (Debit != null) Debit.Amount = value; } }
 
     }
 

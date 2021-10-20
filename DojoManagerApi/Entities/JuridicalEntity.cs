@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 namespace DojoManagerApi.Entities
 {
     [Owned]
+    [WrapMe]
     public class Address
     {
         public string City { get; set; }
@@ -13,6 +14,7 @@ namespace DojoManagerApi.Entities
         public int Number { get; set; }
         public string PostCode { get; set; }
     }
+    [WrapMe]
     public class JuridicalEntity : IJuridicalEntity
     {
         public virtual int Id { get; set; }
@@ -20,14 +22,6 @@ namespace DojoManagerApi.Entities
         public virtual string EMail { get; set; }
         public virtual Address Address { get; set; }
         public virtual string PhoneNumber { get; set; }
-    }
-
-    public class Certificate
-    {
-        public virtual int Id { get; set; }
-        public virtual DateTime Expiry { get; set; }
-        public virtual bool IsCompetitive { get; set; }
-        public virtual string ImagePath { get; set; }
     }
 
     public enum SubscriptionType
@@ -38,7 +32,7 @@ namespace DojoManagerApi.Entities
     }
 
     public enum CashFlowDirection { In, Out }
-
+    [WrapMe]
     public class CashFlow
     {
         public virtual int Id { get; set; }
@@ -48,7 +42,7 @@ namespace DojoManagerApi.Entities
         public virtual DateTime Date { get; set; }
         public virtual CashFlowDirection Direction { get; set; }
     }
-
+    [WrapMe]
     public class DebitPayment : CashFlow
     {
         public virtual Debit Debit { get; set; } //payment is also related to a debit  
