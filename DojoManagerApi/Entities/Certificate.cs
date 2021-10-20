@@ -9,10 +9,7 @@ namespace DojoManagerApi.Entities
         public virtual DateTime Expiry { get; set; }
         public virtual bool IsCompetitive { get; set; }
         public virtual string ImagePath { get; set; }
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
+       
         public override bool Equals(object obj)
         {
             return base.Equals(obj);

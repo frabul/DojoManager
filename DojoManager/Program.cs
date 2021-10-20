@@ -13,6 +13,11 @@ namespace DojoManager
     {
         static void Main(string[] args)
         {
+
+           
+
+
+
             Console.WriteLine("Hello World!");
             var Db = new DojoManagerApi.TestNHibernate();
             Db.DeleteDb();
@@ -47,11 +52,14 @@ namespace DojoManager
             proxy.Name = "marcantonio";
             proxy.AddCard(new Card() { CardId = "hey you", ExpirationDate = DateTime.Now, Type = CardType.Kensei });
             proxy.Subscriptions.Remove(proxy.Subscriptions.Last());
-           
+
             Address add = proxy.Address as Address;
             var add2 = new Address(add);
             var add3 = EntityWrapper.Wrap(add2);
-            
+
+            var h3 = add3.GetHashCode();
+            var h2 = add2.GetHashCode();
+            var isEqual = add3.Equals(add2);
             var sub = (Subscription)EntityWrapper.Wrap(proxy.Subscriptions[0]);
             var deb = sub.Debit;
             Db.Flush();
@@ -72,6 +80,14 @@ namespace DojoManager
 
         }
 
+        public bool Test(object asd)
+        {
+            var t = asd as Address;
+            if(t!= null)
+                return this.Equals(t.Number);
+            else
+                return this.Equals(asd);
+        }
         private static void PritSubscriptions(TestNHibernate Db)
         {
             foreach (var p in Db.ListPersons())

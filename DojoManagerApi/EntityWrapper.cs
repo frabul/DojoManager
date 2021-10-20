@@ -134,7 +134,7 @@ namespace DojoManagerApi
             var delegateCombine = typeof(Delegate).GetMethod("Combine", new[] { typeof(Delegate), typeof(Delegate) });
             var delegateRemove = typeof(Delegate).GetMethod("Remove", new[] { typeof(Delegate), typeof(Delegate) });
 
-            var getHashCodeBase = ot.GetMethod("GetHashCode");
+
             var newTypeName = $"{ot.FullName}{WrapperTypeSuffix}";
 
             if (TypesCreated.ContainsKey(newTypeName))
@@ -154,7 +154,7 @@ namespace DojoManagerApi
             var originField = builder.NewField("_Origin", ot).Public();
 
             //-- constructors
-            builder.NewDefaultConstructor(System.Reflection.MethodAttributes.Public); 
+            builder.NewDefaultConstructor(System.Reflection.MethodAttributes.Public);
             builder.NewConstructor()
                 .Public()
                 .Param(ot, "origin")
@@ -167,16 +167,16 @@ namespace DojoManagerApi
             // implemente IEntityWrapper
             var OriginProperty = builder.NewProperty<object>("Origin");
             OriginProperty.Getter()
-                .MethodAttributes(MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.NewSlot |  MethodAttributes.Virtual)
-                .CallingConvention( CallingConventions.HasThis | CallingConventions.Standard)
+                .MethodAttributes(MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.NewSlot | MethodAttributes.Virtual)
+                .CallingConvention(CallingConventions.HasThis | CallingConventions.Standard)
                 .Body()
                     .LdArg0()
                     .LdFld(originField)
                     .Ret();
-            OriginProperty.Define() ;
+            OriginProperty.Define();
             //add PropertyChanged event 
-           
-    
+
+
 
             //add_PropertyChanged
             var eventAdd = builder.NewMethod("add_PropertyChanged")
@@ -214,17 +214,47 @@ namespace DojoManagerApi
 
 
             //override get hash code
-            var getHashCodeMethod = builder.NewMethod<int>("GetHashCode")
-                .MethodAttributes(MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.HideBySig)
-                .CallingConvention(CallingConventions.Standard | CallingConventions.HasThis)
-                .Body()
-                .LdFld(originField)
-                .Call(getHashCodeBase)
-                .Ret();
-            //builder.Define().DefineMethodOverride(getHashCodeBase, getHashCodeBase);    
+            var oldGetHashCode = ot.GetMethod("GetHashCode");
+            var getHashCodeMethod = builder.NewMethod("GetHashCode")
+                .Returns(oldGetHashCode.ReturnType)
+                .MethodAttributes(oldGetHashCode.Attributes)
+                .CallingConvention(oldGetHashCode.CallingConvention)
+                    .Body()
+                        .LdArg0()
+                        .LdFld(originField)
+                        .CallVirt(oldGetHashCode)
+                        .Ret();
+            //override equals  
+            var oldEquals = ot.GetMethod("Equals", new[] { ot });
+            if (oldEquals != null)
+            {
+                var equalsMethod = builder.NewMethod("Equals")
+                    .Returns(oldEquals.ReturnType)
+                    .MethodAttributes(MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.HideBySig)
+                    .CallingConvention(oldEquals.CallingConvention)
+                    .Params(oldEquals.GetParameters().Select(p => p.ParameterType).ToArray())
+                        .Body()
+                            .DefineLabel(out ILabel lab1)
+                            //fist instance is always Origin
+                            .LdArg0()
+                            .LdFld(originField)
+                            //if arg1 is of type wrapper, load origin, otherwise load itself
+                            .LdArg1()
+                            .IsInst(builder.Define())
+                            .BrFalseS(lab1) //if cast is null jump 
+                                .LdArg1()
+                                .IsInst(builder.Define())
+                                .Call(oldEquals)
+                                .Ret()
+                            .MarkLabel(lab1)//arg1 is of base type
+                            .LdArg1()
+                            .Call(oldEquals)
+                            .Ret();
+            }
 
             //intercept properties
-            foreach (var prop in ot.GetProperties().Where(p => p.GetMethod.IsVirtual))
+            var properties = ot.GetProperties(BindingFlags.Instance /*| BindingFlags.NonPublic*/ | BindingFlags.Public).Where(p => p.GetMethod.IsVirtual).ToList();
+            foreach (var prop in properties)
             {
                 bool shouldWrapIt = NeedsWrapping(prop.PropertyType);
                 bool isCollection = prop.PropertyType.IsAssignableTo(typeof(ICollection));
@@ -256,8 +286,9 @@ namespace DojoManagerApi
                         }); ;
 
                 var eventArgsCtor = typeof(PropertyChangedEventArgs).GetConstructor(new[] { typeof(string) });
-
-                var setter = newProperty.Setter()
+                if (prop.SetMethod != null)
+                {
+                    var setter = newProperty.Setter()
                         .MethodAttributes(MethodAttributes.Virtual | MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig)
                         .Params(prop.PropertyType)
 
@@ -285,10 +316,11 @@ namespace DojoManagerApi
                                 .CallVirt(typeof(PropertyChangedEventHandler).GetMethod("Invoke"))
                             .MarkLabel(retLabel)
                             .Ret());
+                }
 
 
-                newProperty.Define().SetGetMethod(getter.Define());
-                newProperty.Define().SetSetMethod(setter.Define());
+
+                newProperty.Define();
 
 
 
