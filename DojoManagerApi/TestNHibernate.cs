@@ -4,6 +4,7 @@ using FluentNHibernate.Automapping;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
 using FluentNHibernate.Conventions.Helpers;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NHibernate;
 using NHibernate.Cfg;
 using NHibernate.Linq;
@@ -17,20 +18,18 @@ using System.Threading.Tasks;
 
 namespace DojoManagerApi
 {
-    public class AutomapIgnoreAttribute : Attribute
-    {
 
-    }
     public class SqlStatementInterceptor : EmptyInterceptor
     {
         public override NHibernate.SqlCommand.SqlString OnPrepareStatement(NHibernate.SqlCommand.SqlString sql)
         {
-            Console.WriteLine();
-            Console.WriteLine(sql.ToString());
+            //Console.WriteLine();
+            //Console.WriteLine(sql.ToString());
             return sql;
         }
-    
+
     }
+
     public class StoreConfiguration : DefaultAutomappingConfiguration
     {
         public override bool ShouldMap(Type type)
@@ -49,39 +48,78 @@ namespace DojoManagerApi
         }
     }
 
+    [TestClass]
     public class TestNHibernate
     {
-        public ISessionFactory sessionFactory { get; private set; }
-        public string DbFile { get; private set; } = "KenseiDojoDb.db";
+        public const string DbFile = "KenseiDojoDb.db";
+        public TestContext TestContext { get; set; }
 
-        public ISession currentSession;
+        public ISessionFactory SessionFactory { get; private set; }
+        public ISession CurrentSession { get; private set; }
 
+        private DateTime Date(int year, int month) => new DateTime(year, month, 01);
+        List<Person> InitialPersons;
+        List<CashFlow> InitialCashMovements;
 
-        public void Close()
+        public TestNHibernate()
         {
-            currentSession?.Dispose();
-            sessionFactory?.Dispose();
+            var p1 = new Person
+            {
+                Name = "Gennaro Pepe",
+                Address = new Address() { City = "Napoli", Number = 1, PostCode = "84100", Street = "Spaccanapoli" },
+                BirthDate = new DateTime(1982, 1, 1),
+                EMail = "gennaropepe@kensei.it",
+                PhoneNumber = "166101010"
+            };
+            p1.AddCertificate(new Certificate { Expiry = DateTime.Now.AddMonths(7), IsCompetitive = true });
+            p1.AddSubscription(new Subscription() { StartDate = Date(2021, 10), EndDate = Date(2022, 08), Type = SubscriptionType.Kensei_Dojo_Annual_Association, Notes = "Sec iscrizione" }, 360);
+            p1.AddSubscription(new Subscription() { StartDate = Date(2020, 01), EndDate = Date(2021, 01), Type = SubscriptionType.CIK_Annual_Association, Notes = "Prima iscrizione" }, 25);
+            p1.Subscriptions[0].Debit.AddPayment(new DebitPayment() { Amount = 360 });
+
+            var p2 = new Person
+            {
+                Name = "Giulia Spadarella",
+                Address = new Address() { City = "Milano", Number = 1, PostCode = "20160", Street = "via delle spade" },
+                BirthDate = new DateTime(1989, 06, 1),
+                EMail = "gspd@kensei.it",
+                PhoneNumber = "144666333222"
+            };
+            p2.AddCertificate(new Certificate { Expiry = DateTime.Now.AddMonths(-14), IsCompetitive = false });
+            p2.AddCertificate(new Certificate { Expiry = DateTime.Now.AddMonths(-2), IsCompetitive = true });
+            p2.AddSubscription(new Subscription() { StartDate = Date(2020, 10), EndDate = Date(2021, 08), Type = SubscriptionType.Kensei_Dojo_Annual_Association, Notes = "Prima iscrizione" }, 400);
+            p2.AddSubscription(new Subscription() { StartDate = Date(2021, 09), EndDate = Date(2022, 08), Type = SubscriptionType.Kensei_Dojo_Annual_Association, Notes = "Sec iscrizione" }, 360);
+            p2.AddSubscription(new Subscription() { StartDate = Date(2021, 01), EndDate = Date(2022, 01), Type = SubscriptionType.CIK_Annual_Association, Notes = "CIK" }, 25);
+            p2.Subscriptions[1].Debit.AddPayment(new DebitPayment() { Amount = 360 });
+
+            InitialPersons = new() { p1, p2 };
+
+            InitialCashMovements = new()
+            {
+                new CashFlow() { Amount = 100, Date = DateTime.Now, Direction = CashFlowDirection.Out, Notes = "affitto agosto" }
+            };
         }
 
         public void Initialize()
         {
             Close();
+            SessionFactory = null;
             var cfg = new StoreConfiguration();
             var autoMaps =
                 AutoMap.AssemblyOf<TestNHibernate>(cfg)
                         .Conventions.Add(DefaultCascade.All());
-            sessionFactory = Fluently.Configure()
+            SessionFactory = Fluently.Configure()
                             .Database(SQLiteConfiguration.Standard.UsingFile(DbFile))
                             .Mappings(m =>
                                      m.AutoMappings.Add(autoMaps)
                                     .ExportTo(@".\")
                                     )
-                            .ExposeConfiguration(BuildSchema)
+                            .ExposeConfiguration(ConfigHandler)
                             .BuildSessionFactory();
 
-            currentSession = sessionFactory.OpenSession();
+            CurrentSession = SessionFactory.OpenSession();
         }
-        private static void BuildSchema(Configuration config)
+
+        private static void ConfigHandler(Configuration config)
         {
             // delete the existing db on each run
             //if (File.Exists(DbFile))
@@ -100,18 +138,10 @@ namespace DojoManagerApi
             config.SetInterceptor(new SqlStatementInterceptor());
         }
 
-        public void Test(bool delete)
+        public void Close()
         {
-            if (delete)
-                DeleteDb();
-            Initialize();
-            Populate();
-            PrintPersons();
-
-            //----- printing persons again ----
-            var persons = ListPersons();
-            foreach (var p in persons)
-                Console.WriteLine(p.TestPrint());
+            CurrentSession?.Dispose();
+            SessionFactory?.Dispose();
         }
 
         public void DeleteDb()
@@ -120,77 +150,60 @@ namespace DojoManagerApi
                 File.Delete(DbFile);
         }
 
-        public IEnumerable<Person> ListPersons()
+        [TestMethod]
+        public void Test()
         {
+            DeleteDb();
+            Initialize();
+            Populate();
+            PrintPersons();
+            Flush();
 
-            var persons = currentSession.Query<Person>().ToList();
+            //reinitialize
+            Initialize();
+            var persons = ListPersons();
+            foreach (var p in persons)
+                Console.WriteLine(p.PrintData());
+            Assert.IsTrue(persons.Count == 2);
 
-            return persons;
+            for (int i = 0; i < InitialPersons.Count; i++)
+            {
+                var pi = InitialPersons[i];
+                var pn = persons[i];
 
-
+                Assert.IsTrue(pi.Subscriptions.Count == pn.Subscriptions.Count);
+            }
         }
 
-        private DateTime Date(int year, int month) => new DateTime(year, month, 01);
+
+        public List<Person> ListPersons()
+        {
+            var persons = CurrentSession.Query<Person>().ToList();
+            return persons;
+        }
+
         public void Populate()
         {
+            using var transact = CurrentSession.BeginTransaction();
 
-            using (var transact = currentSession.BeginTransaction())
-            {
-                var p1 = new Person
-                {
-                    Name = "Gennaro Pepe",
-                    Address = new Address() { City = "Napoli", Number = 1, PostCode = "84100", Street = "Spaccanapoli" },
-                    BirthDate = new DateTime(1982, 1, 1),
-                    EMail = "gennaropepe@kensei.it",
-                    PhoneNumber = "166101010"
-                };
-                p1.AddCertificate(new Certificate { Expiry = DateTime.Now.AddMonths(7), IsCompetitive = true });
-                var deb1 = p1.AddSubscription(new Subscription() { StartDate = Date(2021, 10), EndDate = Date(2022, 08), Type = SubscriptionType.Kensei_Dojo_Annual_Association, Notes = "Sec iscrizione" }, 360);
-                var deb2 = p1.AddSubscription(new Subscription() { StartDate = Date(2020, 01), EndDate = Date(2021, 01), Type = SubscriptionType.CIK_Annual_Association, Notes = "Prima iscrizione" }, 25);
-                deb1.AddPayment(new DebitPayment() { Amount = 360 });
+            foreach (var p in InitialPersons)
+                CurrentSession.SaveOrUpdate(p);
 
-                currentSession.SaveOrUpdate(deb1);
-                currentSession.SaveOrUpdate(deb2);
-                currentSession.SaveOrUpdate(p1);
-
-
-                var p2 = new Person
-                {
-                    Name = "Giulia Spadarella",
-                    Address = new Address() { City = "Milano", Number = 1, PostCode = "20160", Street = "via delle spade" },
-                    BirthDate = new DateTime(1989, 06, 1),
-                    EMail = "gspd@kensei.it",
-                    PhoneNumber = "144666333222"
-                };
-                p2.AddCertificate(new Certificate { Expiry = DateTime.Now.AddMonths(-14), IsCompetitive = false });
-                p2.AddCertificate(new Certificate { Expiry = DateTime.Now.AddMonths(-2), IsCompetitive = true });
-                var deb3 = p2.AddSubscription(new Subscription() { StartDate = Date(2020, 10), EndDate = Date(2021, 08), Type = SubscriptionType.Kensei_Dojo_Annual_Association, Notes = "Prima iscrizione" }, 400);
-                var deb4 = p2.AddSubscription(new Subscription() { StartDate = Date(2021, 09), EndDate = Date(2022, 08), Type = SubscriptionType.Kensei_Dojo_Annual_Association, Notes = "Sec iscrizione" }, 360);
-                var deb5 = p2.AddSubscription(new Subscription() { StartDate = Date(2021, 01), EndDate = Date(2022, 01), Type = SubscriptionType.CIK_Annual_Association, Notes = "CIK" }, 25);
-                deb3.AddPayment(new DebitPayment() { Amount = 400 });
-                currentSession.SaveOrUpdate(deb3);
-                currentSession.SaveOrUpdate(deb4);
-                currentSession.SaveOrUpdate(deb5);
-
-                currentSession.SaveOrUpdate(p2);
-
-                var of = new CashFlow() { Amount = 100, Date = DateTime.Now, Direction = CashFlowDirection.Out, Notes = "affitto agosto" };
-                currentSession.SaveOrUpdate(of);
-
-                transact.Commit();
-            }
-
+            foreach (var cf in InitialPersons)
+                CurrentSession.SaveOrUpdate(cf);
+            transact.Commit();
         }
 
         public void PrintPersons()
         {
-            var persons = currentSession.Query<Person>().ToList();
+            var persons = CurrentSession.Query<Person>().ToList();
             foreach (var pers in persons)
-                Console.WriteLine(pers.TestPrint());
+                Console.WriteLine(pers.PrintData());
         }
+
         public void Flush()
         {
-            currentSession.Flush();
+            CurrentSession.Flush();
         }
     }
 

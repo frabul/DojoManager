@@ -11,7 +11,7 @@ namespace DojoManagerApi.Entities
         public virtual string ImagePath { get; set; }
         public override int GetHashCode()
         {
-            return base.GetHashCode();  
+            return base.GetHashCode();
         }
         public override bool Equals(object obj)
         {
@@ -26,7 +26,10 @@ namespace DojoManagerApi.Entities
         {
             return !(obj1 == obj2);
         }
+
+        public virtual string PrintData()
+        {
+            return $"{{ Id: {Id}, Competitive: {IsCompetitive}, Expiration:{Expiry:yyyy-MM-dd} }}";
+        }
     }
-
-
 }

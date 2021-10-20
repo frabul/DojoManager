@@ -47,6 +47,11 @@ namespace DojoManager
             proxy.Name = "marcantonio";
             proxy.AddCard(new Card() { CardId = "hey you", ExpirationDate = DateTime.Now, Type = CardType.Kensei });
             proxy.Subscriptions.Remove(proxy.Subscriptions.Last());
+           
+            Address add = proxy.Address as Address;
+            var add2 = new Address(add);
+            var add3 = EntityWrapper.Wrap(add2);
+            
             var sub = (Subscription)EntityWrapper.Wrap(proxy.Subscriptions[0]);
             var deb = sub.Debit;
             Db.Flush();

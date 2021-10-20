@@ -74,7 +74,7 @@ namespace DojoManagerApi
                 Console.WriteLine("Querying for all subjects afert closing db");
                 persons = db.Persons
                     .Include(p => p.Certificates)
-                    .Include(p => p.Debits)
+                    //.Include(p => p.Debits)
                     .Include(p => p.Subscriptions)
                     .AsSplitQuery()
                     .OrderBy(b => b.Name)
@@ -87,53 +87,14 @@ namespace DojoManagerApi
 
         public void Populate(DojoManagerContext db)
         {
-            var p1 = new Person
-            {
-                Name = "Gennaro Pepe",
-                Address = new Address() { City = "Napoli", Number = 1, PostCode = "84100", Street = "Spaccanapoli" },
-                BirthDate = new DateTime(1982, 1, 1),
-                EMail = "gennaropepe@kensei.it",
-                PhoneNumber = "166101010"
-            };
-            p1.AddCertificate(new Certificate { Expiry = DateTime.Now.AddMonths(7), IsCompetitive = true });
-            var deb1 = p1.AddSubscription(new Subscription() { StartDate = Date(2021, 10), EndDate = Date(2022, 08), Type = SubscriptionType.Kensei_Dojo_Annual_Association }, 360);
-            var deb2 = p1.AddSubscription(new Subscription() { StartDate = Date(2021, 01), EndDate = Date(2022, 01), Type = SubscriptionType.CIK_Annual_Association, Notes = "Prima iscrizione" }, 25);
-            deb1.AddPayment(new DebitPayment() { Amount = 360 });
-
-           
-            db.Add(p1);
-
-            var p2 = new Person
-            {
-                Name = "Giulia Spadarella",
-                Address = new Address() { City = "Milano", Number = 1, PostCode = "20160", Street = "via delle spade" },
-                BirthDate = new DateTime(1989, 06, 1),
-                EMail = "gspd@kensei.it",
-                PhoneNumber = "144666333222"
-            };
-            p2.AddCertificate(new Certificate { Expiry = DateTime.Now.AddMonths(-14), IsCompetitive = false });
-            p2.AddCertificate(new Certificate { Expiry = DateTime.Now.AddMonths(-2), IsCompetitive = true });
-            var deb3 = p2.AddSubscription(new Subscription() { StartDate = Date(2020, 10), EndDate = Date(2021, 08), Type = SubscriptionType.Kensei_Dojo_Annual_Association }, 400);
-            var deb4 = p2.AddSubscription(new Subscription() { StartDate = Date(2021, 09), EndDate = Date(2022, 08), Type = SubscriptionType.Kensei_Dojo_Annual_Association }, 360);
-            var deb5 = p2.AddSubscription(new Subscription() { StartDate = Date(2021, 01), EndDate = Date(2022, 01), Type = SubscriptionType.CIK_Annual_Association, Notes = "Prima iscrizione" }, 25);
-            deb3.AddPayment(new DebitPayment() { Amount = 400 });
-     
-
-            db.Add(p2);
-
-            var of = new CashFlow() { Amount = 100, Date = DateTime.Now, Direction = CashFlowDirection.Out, Notes = "affitto agosto" };
-            db.Add(of);
-
-            db.SaveChanges();
-
-
+            throw new NotImplementedException(); 
         }
 
         public IEnumerable<Person> ListPersons()
         {
             using (var sess = new DojoManagerContext())
             {
-                var persons = sess.Persons.ToList(); 
+                var persons = sess.Persons.ToList();
                 return persons;
             }
         }
@@ -146,6 +107,6 @@ namespace DojoManagerApi
                 return persons;
             }
         }
-          
+
     }
 }

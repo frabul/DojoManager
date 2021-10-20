@@ -2,8 +2,7 @@
 
 namespace DojoManagerApi
 {
-
-    public class WrapMeAttribute : Attribute
+    public class AutomapIgnoreAttribute : Attribute
     {
 
     }

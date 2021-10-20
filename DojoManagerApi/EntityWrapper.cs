@@ -23,7 +23,7 @@ namespace DojoManagerApi
         public LinkedObservableCollection(IList<T> li) : base()
         {
             Origin = li;
-            foreach(var it in li)
+            foreach (var it in li)
                 this.Add(it);
         }
 
@@ -43,7 +43,7 @@ namespace DojoManagerApi
 
         protected override void MoveItem(int oldIndex, int newIndex)
         {
-            throw new NotImplementedException(); 
+            throw new NotImplementedException();
         }
 
         protected override void RemoveItem(int index)
@@ -59,7 +59,7 @@ namespace DojoManagerApi
             base.SetItem(index, wrapped);
         }
     }
-    public interface IWrapper
+    public interface IEntityWrapper
     {
         object Origin { get; }
     }
@@ -111,53 +111,19 @@ namespace DojoManagerApi
             while (!TypeUtils.HasAttribute<WrapMeAttribute>(ot))
                 ot = ot.BaseType;
 
-            Type newType = EmitType(ot);
+            // get the new type
+            Type newType = BuildNewType(ot);
 
             //create new instance now and register it ( before cascading replacements to avoid endless loop )
             object inst = Activator.CreateInstance(newType, entity);
             if (inst == null)
                 throw new Exception("Unable to create");
             WrappedObjects[entity] = inst;
-
-
-            //replace members of origin
-            //here we need to substitute both objects and collections of objects
-            foreach (var prop in ot.GetProperties())
-            {
-                var isEntyty = TypeUtils.HasAttribute<WrapMeAttribute>(prop.PropertyType);
-                var isCollection = prop.PropertyType.IsAssignableTo(typeof(IEnumerable<object>));
-                if (isEntyty)
-                {
-                    //var oldVal = prop.GetValue(entity, null);
-                    //prop.SetValue(entity, EntityWrapper.Wrap(oldVal));
-                }
-                else if (isCollection)
-                {
-                    //Type basicType = TypeUtils.GetElementType(prop.PropertyType);
-                    //isEntyty = TypeUtils.HasAttribute<WrapMeAttribute>(basicType);
-
-                    //Type destListType = typeof(ObservableCollection<>).MakeGenericType(new Type[] { basicType });
-                    //var source = (IEnumerable<object>)prop.GetValue(entity);
-                    //var dest = Activator.CreateInstance(destListType);
-                    //var destAdd = destListType.GetMethod("Add", new Type[] { basicType });
-                    //foreach (var obj in source)
-                    //{
-                    //    var toAdd = obj;
-                    //    //if (isEntyty)
-                    //    //    toAdd = EntityWrapper.Wrap(obj);
-
-                    //    destAdd.Invoke(dest, new[] { toAdd });
-                    //}
-                    //prop.SetValue(entity, dest);
-
-                }
-            }
-
             return inst;
 
         }
 
-        private static Type EmitType(Type ot)
+        private static Type BuildNewType(Type ot)
         {
             //Check if wrapping is needed
             if (!NeedsWrapping(ot))
@@ -167,7 +133,7 @@ namespace DojoManagerApi
             //definitions 
             var delegateCombine = typeof(Delegate).GetMethod("Combine", new[] { typeof(Delegate), typeof(Delegate) });
             var delegateRemove = typeof(Delegate).GetMethod("Remove", new[] { typeof(Delegate), typeof(Delegate) });
-           
+
             var getHashCodeBase = ot.GetMethod("GetHashCode");
             var newTypeName = $"{ot.FullName}{WrapperTypeSuffix}";
 
@@ -177,13 +143,40 @@ namespace DojoManagerApi
             //type not yet created, let's create it
             var builder = TypeFactory
                             .Default
-                            .NewType(newTypeName).InheritsFrom(ot)
+                            .NewType(newTypeName)
+                            .InheritsFrom(ot)
+                            .Implements<IEntityWrapper>()
                             .Implements<INotifyPropertyChanged>();
 
-
-            //add PropertyChanged event
+            //add  fields
             var propertyChangedEvent = builder.NewEvent("PropertyChanged", typeof(PropertyChangedEventHandler));
             var propertyChangedField = builder.NewField("PropertyChanged", typeof(PropertyChangedEventHandler));
+            var originField = builder.NewField("_Origin", ot).Public();
+
+            //-- constructors
+            builder.NewDefaultConstructor(System.Reflection.MethodAttributes.Public); 
+            builder.NewConstructor()
+                .Public()
+                .Param(ot, "origin")
+                .Body()
+                .LdArg0()
+                .LdArg1()
+                .StFld(originField)
+                .Ret();
+
+            // implemente IEntityWrapper
+            var OriginProperty = builder.NewProperty<object>("Origin");
+            OriginProperty.Getter()
+                .MethodAttributes(MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.NewSlot |  MethodAttributes.Virtual)
+                .CallingConvention( CallingConventions.HasThis | CallingConventions.Standard)
+                .Body()
+                    .LdArg0()
+                    .LdFld(originField)
+                    .Ret();
+            OriginProperty.Define() ;
+            //add PropertyChanged event 
+           
+    
 
             //add_PropertyChanged
             var eventAdd = builder.NewMethod("add_PropertyChanged")
@@ -219,18 +212,6 @@ namespace DojoManagerApi
                     );
             propertyChangedEvent.Define().SetRemoveOnMethod(eventRemove.Define());
 
-            //add Origin field
-            var originField = builder.NewField("Origin", ot).Public();
-            builder.NewDefaultConstructor(System.Reflection.MethodAttributes.Public);
-
-            builder.NewConstructor()
-                .Public()
-                .Param(ot, "origin")
-                .Body()
-                .LdArg0()
-                .LdArg1()
-                .StFld(originField)
-                .Ret();
 
             //override get hash code
             var getHashCodeMethod = builder.NewMethod<int>("GetHashCode")
@@ -259,7 +240,7 @@ namespace DojoManagerApi
                            .LdArg0()
                            .LdFld(originField)
                            .Call(prop.GetMethod);
-                       
+
                             if (isCollection)
                             {
                                 //returns new LinkedObservableCollection
@@ -270,7 +251,7 @@ namespace DojoManagerApi
                             {
                                 //return wrapped objec if the type is decorated by WrapMe
                                 m.Call(typeof(EntityWrapper).GetMethod("Wrap"));
-                            } 
+                            }
                             m.Ret();
                         }); ;
 
