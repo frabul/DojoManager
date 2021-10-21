@@ -59,9 +59,9 @@ namespace DojoManagerApi
             base.SetItem(index, wrapped);
         }
     }
-    public interface IEntityWrapper
+    public interface IEntityWrapper<T>
     {
-        object Origin { get; }
+        T Origin { get; }
     }
     /// <summary>
     /// Creates a new class that inherit from the wrapped type
@@ -145,7 +145,7 @@ namespace DojoManagerApi
                             .Default
                             .NewType(newTypeName)
                             .InheritsFrom(ot)
-                            .Implements<IEntityWrapper>()
+                            .Implements(typeof(IEntityWrapper<>).MakeGenericType(ot))
                             .Implements<INotifyPropertyChanged>();
 
             //add  fields
@@ -165,16 +165,17 @@ namespace DojoManagerApi
                 .Ret();
 
             // implemente IEntityWrapper
-            var OriginProperty = builder.NewProperty<object>("Origin");
+            var OriginProperty = builder
+                .NewProperty("Origin", ot);
             OriginProperty.Getter()
-                .MethodAttributes(MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.NewSlot | MethodAttributes.Virtual)
+                .MethodAttributes(MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.Virtual)
                 .CallingConvention(CallingConventions.HasThis | CallingConventions.Standard)
                 .Body()
                     .LdArg0()
                     .LdFld(originField)
                     .Ret();
             OriginProperty.Define();
-            //add PropertyChanged event 
+
 
 
 

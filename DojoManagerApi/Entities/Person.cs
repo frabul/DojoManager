@@ -6,12 +6,16 @@ using System.Text;
 namespace DojoManagerApi.Entities
 {
     [WrapMe]
-    public class Person : JuridicalEntity
+    public class Person : JuridicalEntity, IEntityWrapper<Person>
     {
         public virtual DateTime BirthDate { get; set; }
         public virtual IList<Certificate> Certificates { get; set; } = new List<Certificate>();
         public virtual IList<Subscription> Subscriptions { get; set; } = new List<Subscription>();
         public virtual IList<Card> Cards { get; set; } = new List<Card>();
+    
+        [AutomapIgnoreAttribute]
+        public virtual Person Origin => this;
+
         //public virtual IList<Debit> Debits { get; set; } = new List<Debit>();
         public virtual void AddCard(Card card)
         {
@@ -28,10 +32,14 @@ namespace DojoManagerApi.Entities
         {
             var deb = new Debit() { Amount = cost, Person = this, Subscription = subscription };
             subscription.Debit = deb;
-            subscription.Person = this;
+            subscription.Person = Origin;
             Subscriptions.Add(subscription);
             //this.Debits.Add(deb);
             //return deb;
+        }
+        public virtual decimal TotalDue()
+        {
+            return Subscriptions.Select(s => s.Debit.Amount - s.Debit.Payments.Select(p => p.Amount).Sum()).Sum();
         }
 
         public override string ToString()

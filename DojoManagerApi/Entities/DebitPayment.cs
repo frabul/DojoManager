@@ -7,6 +7,6 @@
         public DebitPayment()
         {
             Direction = CashFlowDirection.In;
-        }
+        } 
     }
 }

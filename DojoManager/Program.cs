@@ -14,12 +14,16 @@ namespace DojoManager
         static void Main(string[] args)
         {
 
-           
 
 
+            string asdasd= "asd".PadLeft(3);
 
             Console.WriteLine("Hello World!");
             var Db = new DojoManagerApi.TestNHibernate();
+
+            Db.Test1();
+            Db.Test2();
+            Db.Test3();
             Db.DeleteDb();
             Db.Initialize();
             Db.Populate();
@@ -53,13 +57,8 @@ namespace DojoManager
             proxy.AddCard(new Card() { CardId = "hey you", ExpirationDate = DateTime.Now, Type = CardType.Kensei });
             proxy.Subscriptions.Remove(proxy.Subscriptions.Last());
 
-            Address add = proxy.Address as Address;
-            var add2 = new Address(add);
-            var add3 = EntityWrapper.Wrap(add2);
-
-            var h3 = add3.GetHashCode();
-            var h2 = add2.GetHashCode();
-            var isEqual = add3.Equals(add2);
+ 
+    
             var sub = (Subscription)EntityWrapper.Wrap(proxy.Subscriptions[0]);
             var deb = sub.Debit;
             Db.Flush();

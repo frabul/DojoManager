@@ -18,7 +18,7 @@ namespace DojoManagerApi.Entities
         }
         public virtual void AddPayment(DebitPayment debitPayment)
         {
-            debitPayment.Counterpart = Person;
+            debitPayment.Counterpart = Person.Origin;
             debitPayment.Debit = this;
             this.Payments.Add(debitPayment);
         }

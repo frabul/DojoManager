@@ -48,7 +48,7 @@ namespace DojoManagerApi
         }
     }
 
-    [TestClass]
+    [TestClass()]
     public class TestNHibernate
     {
         public const string DbFile = "KenseiDojoDb.db";
@@ -63,6 +63,11 @@ namespace DojoManagerApi
 
         public TestNHibernate()
         {
+            CreateInitialData();
+        }
+
+        private void CreateInitialData()
+        {
             var p1 = new Person
             {
                 Name = "Gennaro Pepe",
@@ -75,7 +80,7 @@ namespace DojoManagerApi
             p1.AddSubscription(new Subscription() { StartDate = Date(2021, 10), EndDate = Date(2022, 08), Type = SubscriptionType.Kensei_Dojo_Annual_Association, Notes = "Sec iscrizione" }, 360);
             p1.AddSubscription(new Subscription() { StartDate = Date(2020, 01), EndDate = Date(2021, 01), Type = SubscriptionType.CIK_Annual_Association, Notes = "Prima iscrizione" }, 25);
             p1.Subscriptions[0].Debit.AddPayment(new DebitPayment() { Amount = 360 });
-
+            p1.AddCard(new Card() { CardId = "1", Type = CardType.Kensei, Invalidated = true });
             var p2 = new Person
             {
                 Name = "Giulia Spadarella",
@@ -90,7 +95,7 @@ namespace DojoManagerApi
             p2.AddSubscription(new Subscription() { StartDate = Date(2021, 09), EndDate = Date(2022, 08), Type = SubscriptionType.Kensei_Dojo_Annual_Association, Notes = "Sec iscrizione" }, 360);
             p2.AddSubscription(new Subscription() { StartDate = Date(2021, 01), EndDate = Date(2022, 01), Type = SubscriptionType.CIK_Annual_Association, Notes = "CIK" }, 25);
             p2.Subscriptions[1].Debit.AddPayment(new DebitPayment() { Amount = 360 });
-
+            p2.AddCard(new Card() { CardId = "2", Type = CardType.CIK, Invalidated = true });
             InitialPersons = new() { p1, p2 };
 
             InitialCashMovements = new()
@@ -142,6 +147,8 @@ namespace DojoManagerApi
         {
             CurrentSession?.Dispose();
             SessionFactory?.Dispose();
+            CurrentSession = null;
+            SessionFactory = null;
         }
 
         public void DeleteDb()
@@ -150,8 +157,18 @@ namespace DojoManagerApi
                 File.Delete(DbFile);
         }
 
+        void Mod1(Person p)
+        {
+            p.Name = "spastico";
+            p.BirthDate = new DateTime(1987, 1, 1);
+            p.Certificates.RemoveAt(0);
+            //p.AddCertificate(new Certificate() { Expiry = DateTime.Now.AddYears(1), IsCompetitive = false });
+            //p.AddCard(new Card() { CardId = "asd asd asd", ValidityStartDate = DateTime.Now });
+            //p.Cards.RemoveAt(0);
+            //p.AddSubscription(new Subscription() { Type = SubscriptionType.CIK_Annual_Association }, 156);
+        }
         [TestMethod]
-        public void Test()
+        public void Test1()
         {
             DeleteDb();
             Initialize();
@@ -162,6 +179,56 @@ namespace DojoManagerApi
             //reinitialize
             Initialize();
             var persons = ListPersons();
+            CompareToInitialSet(persons);
+
+            Initialize(); 
+        }
+        [TestMethod]
+        public void Test2()
+        {
+            Close();
+            DeleteDb();
+            Initialize();
+            Populate();
+
+            
+
+            Close(); 
+            Initialize();
+
+            var persons = ListPersons();//.Select(p => EntityWrapper.Wrap(p) as Person).ToArray();
+            Mod1(persons[0]);
+            Mod1(InitialPersons[0]);
+
+            Flush();
+            Initialize();
+
+            CompareToInitialSet(ListPersons());
+            CompareToInitialSet(ListPersons().Select(p => EntityWrapper.Wrap(p) as Person).ToList());
+        }
+        [TestMethod]
+        public void Test3()
+        {
+
+            DeleteDb();
+            Initialize();
+            Populate();
+            Close();
+
+            Initialize();
+            var persons = ListPersons().Select(p => EntityWrapper.Wrap(p) as Person).ToArray();
+            Mod1(persons[0]);
+            Mod1(InitialPersons[0]);
+            Flush();
+            Close();
+
+            Initialize();
+
+            CompareToInitialSet(ListPersons());
+            CompareToInitialSet(ListPersons().Select(p => EntityWrapper.Wrap(p) as Person).ToList());
+        }
+        private void CompareToInitialSet(List<Person> persons)
+        {
             foreach (var p in persons)
                 Console.WriteLine(p.PrintData());
             Assert.IsTrue(persons.Count == 2);
@@ -170,11 +237,20 @@ namespace DojoManagerApi
             {
                 var pi = InitialPersons[i];
                 var pn = persons[i];
-
+                Assert.AreEqual(pi.TotalDue(), pn.TotalDue());
                 Assert.IsTrue(pi.Subscriptions.Count == pn.Subscriptions.Count);
+                Assert.IsTrue(pi.Certificates.Count == pn.Certificates.Count);
+                Assert.IsTrue(pi.Cards.Count == pn.Cards.Count);
+                for (int s = 0; s < pi.Subscriptions.Count; s++)
+                {
+                    Assert.AreEqual(pi.Subscriptions[s].Type, pn.Subscriptions[s].Type);
+                    Assert.IsTrue(pi.Subscriptions[s].Debit.Amount == pn.Subscriptions[s].Debit.Amount);
+                    for (int d = 0; d < pi.Subscriptions[s].Debit.Payments.Count; d++)
+                        Assert.IsTrue(pi.Subscriptions[s].Debit.Payments[d].Amount == pn.Subscriptions[s].Debit.Payments[d].Amount);
+
+                } 
             }
         }
-
 
         public List<Person> ListPersons()
         {
@@ -184,13 +260,14 @@ namespace DojoManagerApi
 
         public void Populate()
         {
+            CreateInitialData();
             using var transact = CurrentSession.BeginTransaction();
 
             foreach (var p in InitialPersons)
-                CurrentSession.SaveOrUpdate(p);
+                CurrentSession.Save(p);
 
-            foreach (var cf in InitialPersons)
-                CurrentSession.SaveOrUpdate(cf);
+            foreach (var cf in InitialCashMovements)
+                CurrentSession.Save(cf);
             transact.Commit();
         }
 
