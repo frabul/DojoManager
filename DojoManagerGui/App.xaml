@@ -4,7 +4,12 @@
              xmlns:local="clr-namespace:DojoManagerGui" 
              >
     <Application.Resources>
+        
+
         <ResourceDictionary>
+            <Style x:Key="ControlBaseStyle" TargetType="{x:Type Control}">
+                <Setter Property="Margin" Value="50" />
+            </Style>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />

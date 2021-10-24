@@ -21,7 +21,11 @@ namespace DojoManagerGui
         protected override void OnStartup(StartupEventArgs e)
         {
             Db = new DojoManagerApi.TestNHibernate();
+            //Db.DeleteDb();
             Db.Initialize();
+            //Db.Populate();
+            //Db.Flush(); 
+            
             //var decorated = EntitiesViewModelProxy<IDebit>.Create(Db.ListPersons().SelectMany(p => p.Debits).FirstOrDefault() );
             var persons = Db.ListPersons();
             var proxy = (Person)EntityWrapper.Wrap(persons.First() );

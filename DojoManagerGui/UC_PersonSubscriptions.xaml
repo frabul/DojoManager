@@ -5,22 +5,48 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DojoManagerGui"
              xmlns:entities="clr-namespace:DojoManagerApi.Entities;assembly=DojoManagerApi"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls" 
+             xmlns:viewmodels="clr-namespace:DojoManagerGui.ViewModels" 
+             d:DataContext="{d:DesignInstance Type=viewmodels:VM_PersonSubscriptions}"
              mc:Ignorable="d"  >
     <Grid>
-        <DataGrid ItemsSource="{Binding . }" AutoGenerateColumns="False">
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <DataGrid Name="DataGridSubscriptions" ItemsSource="{Binding Subscriptions}" AutoGenerateColumns="False"  CanUserAddRows="False"
+                  CanUserDeleteRows="False"  >
 
             <d:DataGrid.ItemsSource>
                 <x:Array Type="{x:Type entities:Subscription}">
                     <entities:Subscription  Type="Kensei_Dojo_Annual_Association" StartDate="2021/09/01"></entities:Subscription>
-                    <entities:Subscription  Type="CIK_Annual_Association" StartDate="2021/09/01" ></entities:Subscription> 
+                    <entities:Subscription  Type="CIK_Annual_Association" StartDate="2021/09/01" ></entities:Subscription>
                 </x:Array>
             </d:DataGrid.ItemsSource>
 
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Tipo" Binding="{Binding Type }"></DataGridTextColumn> 
-                <DataGridTextColumn Header="Data" Binding="{Binding StartDate, StringFormat=d}"></DataGridTextColumn>
-                <DataGridTextColumn Header="Costo" Binding="{Binding Debit.Cost }"></DataGridTextColumn>
+                <DataGridTemplateColumn Header="" >
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button  Height="25" Width="25" Padding="2" Command="{Binding DataContext.Remove, ElementName=DataGridSubscriptions}" CommandParameter="{Binding .}" >
+                                <Path   Stretch="Fill"  Fill="Black" 
+                                       Data="M20,6H16V5a3,3,0,0,0-3-3H11A3,3,0,0,0,8,5V6H4A1,1,0,0,0,4,8H5V19a3,3,0,0,0,3,3h8a3,3,0,0,0,3-3V8h1a1,1,0,0,0,0-2ZM10,5a1,1,0,0,1,1-1h2a1,1,0,0,1,1,1V6H10Zm7,14a1,1,0,0,1-1,1H8a1,1,0,0,1-1-1V8H17Z">
+
+                                </Path>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Tipo" Binding="{Binding Type }"></DataGridTextColumn>
+                <DataGridTextColumn Header="Inizio" Binding="{Binding StartDate, StringFormat=d}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Fine" Binding="{Binding EndDate, StringFormat=d}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Costo" Binding="{Binding Debit.Amount }"></DataGridTextColumn>
+
+                <DataGridTextColumn Header="Note" Width="1*" MinWidth="200" Binding="{Binding Notes}">
+                     
+                </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
+        <Button Grid.Row="1" Height="20" HorizontalAlignment="Stretch" Command="{Binding Add}">Aggiungi</Button>
     </Grid>
 </UserControl>

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="DojoManagerGui.UC_MembersList"
+﻿<UserControl x:Class="DojoManagerGui.UC_ListPersons"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -11,8 +11,8 @@
             <ColumnDefinition Width="Auto"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        
-        <DataGrid ItemsSource="{Binding Members}" AutoGenerateColumns="False">
+
+        <DataGrid ItemsSource="{Binding Persons}" SelectedItem="{Binding PersonSelected}" AutoGenerateColumns="False">
             <DataGrid.Columns>
                 <DataGridTextColumn IsReadOnly="True" Header="Nome" Binding="{Binding Person.Name}"></DataGridTextColumn>
                 <DataGridTextColumn IsReadOnly="True" Header="Iscrizione" Binding="{Binding CertiFicateExpiration, StringFormat=d}"></DataGridTextColumn>

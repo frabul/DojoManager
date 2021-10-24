@@ -4,9 +4,10 @@
                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                  xmlns:ViewModels="clr-namespace:DojoManagerGui.ViewModels" 
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"  
+                 xmlns:local="clr-namespace:DojoManagerGui"
                  Title="DojoManager"
-                 Height="600"
-                 Width="800"
+                 Height="800"
+                 Width="1400"
                  >
     <mah:MetroWindow.Resources>
         <ViewModels:VM_MainWindow x:Key="vm"/>
@@ -16,19 +17,26 @@
             <ColumnDefinition Width="Auto" ></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-
+         
         <Border BorderThickness="0,0,1,0" BorderBrush="DeepSkyBlue">
             <ListBox x:Name="Functions" 
                  Width="Auto" Margin="5"  
                  ItemsSource="{Binding FunctionPages}"  
                      SelectedItem="{Binding FunctionSelected}"
-                 DisplayMemberPath="Name"  />
-
+                 DisplayMemberPath="Name"  /> 
         </Border>
         <mah:MetroContentControl Grid.Column="1" Content="{Binding FunctionSelected}" >
             <ContentControl.Resources>
-                <DataTemplate DataType="{x:Type ViewModels:VM_ListAssociates}">
-                    
+                <DataTemplate DataType="{x:Type ViewModels:VM_ListPersons}">
+                    <DockPanel  >
+                        <GroupBox Header="Persone">
+                            <local:UC_ListPersons></local:UC_ListPersons>
+                        </GroupBox>
+                        <GroupBox Header="Dati Persona Selezionata"> 
+                            <local:UC_PersonView DataContext="{Binding PersonSelected}" ></local:UC_PersonView>
+                        </GroupBox>
+                    </DockPanel>
+                        
                 </DataTemplate>
             </ContentControl.Resources>
         </mah:MetroContentControl>

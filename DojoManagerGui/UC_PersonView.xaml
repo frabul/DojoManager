@@ -1,0 +1,101 @@
+﻿<UserControl x:Class="DojoManagerGui.UC_PersonView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DojoManagerGui"
+             xmlns:DojoManagerApi="clr-namespace:DojoManagerApi.Entities;assembly=DojoManagerApi"
+             xmlns:entities="clr-namespace:DojoManagerApi.Entities;assembly=DojoManagerApi"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:viewmodels="clr-namespace:DojoManagerGui.ViewModels" 
+             d:DataContext="{d:DesignInstance Type=viewmodels:VM_Person}"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="800"
+             d:Background="Gray"
+             x:Name="root">
+    <UserControl.Resources>
+        <Style   TargetType="{x:Type TextBox}">
+            <Setter Property="Margin" Value="3" />
+        </Style>
+    </UserControl.Resources>
+    <StackPanel>
+
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid.Resources>
+                <Style TargetType="{x:Type Label}">
+                    <Setter Property="MinWidth" Value="100"></Setter>
+                </Style>
+            </Grid.Resources>
+
+            <StackPanel Grid.Column="0" Orientation="Vertical">
+                <DockPanel>
+                    <Label Margin="3">Nome:</Label>
+                    <TextBox Margin="3" Text="{Binding Person.Name}"></TextBox>
+                </DockPanel>
+                <DockPanel>
+                    <Label Margin="3">Data di nascita:</Label>
+                    <TextBox Margin="3" Text="{Binding Person.BirthDate, StringFormat=dd/MM/yyyy}"></TextBox>
+                </DockPanel>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Vertical">
+                <DockPanel>
+                    <Label Margin="3">Email:</Label>
+                    <TextBox Margin="3" Text="{Binding Person.EMail}"></TextBox>
+                </DockPanel>
+                <DockPanel>
+                    <Label Margin="3">Tel:</Label>
+                    <TextBox Margin="3" Text="{Binding Person.PhoneNumber}"></TextBox>
+                </DockPanel>
+            </StackPanel>
+
+        </Grid>
+        <Expander Header="Sottoscrizioni">
+            <local:UC_PersonSubscriptions DataContext="{Binding Subscriptions}"></local:UC_PersonSubscriptions>
+        </Expander>
+        <Expander Header="Tessere">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <DataGrid Name="CardsDataGrid" ItemsSource="{Binding Person.Cards}" 
+                          AutoGenerateColumns="False" CanUserAddRows="False"
+                          CanUserDeleteRows="False"  >
+ 
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="" >
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button  Height="25" Width="25" Padding="2" Command="{Binding RemoveCard , ElementName=root.DataContex}" CommandParameter="{Binding .}" >
+                                        <Path   Stretch="Fill"  Fill="Black" 
+                                                Data="M20,6H16V5a3,3,0,0,0-3-3H11A3,3,0,0,0,8,5V6H4A1,1,0,0,0,4,8H5V19a3,3,0,0,0,3,3h8a3,3,0,0,0,3-3V8h1a1,1,0,0,0,0-2ZM10,5a1,1,0,0,1,1-1h2a1,1,0,0,1,1,1V6H10Zm7,14a1,1,0,0,1-1,1H8a1,1,0,0,1-1-1V8H17Z">
+                                        </Path>
+                                    </Button>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Tipo" Binding="{Binding  Type }"></DataGridTextColumn>
+                        <DataGridTextColumn Header="Inizio" Binding="{Binding ValidityStartDate, StringFormat=d}"></DataGridTextColumn>
+                        <DataGridTextColumn Header="Fine" Binding="{Binding ExpirationDate, StringFormat=d}"></DataGridTextColumn>
+                        <DataGridCheckBoxColumn  Header="Invalidata" Binding="{Binding Invalidated}"></DataGridCheckBoxColumn> 
+                        <DataGridTextColumn Header="Note" Width="1*" MinWidth="200" Binding="{Binding Notes}">
+
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <Button Grid.Row="1" Height="20" HorizontalAlignment="Stretch" Command="{Binding AddNewCard}">Aggiungi</Button>
+            </Grid>
+        </Expander>
+
+        <Expander Header="Certificati">
+            <local:UC_PersonSubscriptions DataContext="{Binding Subscriptions}"></local:UC_PersonSubscriptions>
+        </Expander>
+
+    </StackPanel>
+</UserControl>

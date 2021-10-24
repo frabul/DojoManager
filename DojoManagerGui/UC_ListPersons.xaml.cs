@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace DojoManagerGui
 {
     /// <summary>
-    /// Interaction logic for UC_PersonEditor.xaml
+    /// Interaction logic for UC_ListPersons.xaml
     /// </summary>
-    public partial class UC_PersonEditor : UserControl
+    public partial class UC_ListPersons : UserControl
     {
-        public UC_PersonEditor()
+        public UC_ListPersons()
         {
             InitializeComponent();
         }
