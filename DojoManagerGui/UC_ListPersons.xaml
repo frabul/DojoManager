@@ -3,24 +3,65 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:DojoManagerGui"
+             xmlns:local="clr-namespace:DojoManagerGui" 
+             xmlns:viewmodels="clr-namespace:DojoManagerGui.ViewModels" 
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             d:DataContext="{d:DesignInstance Type=viewmodels:VM_ListPersons}"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" 
+             x:Name="root">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"></ColumnDefinition>
-            <ColumnDefinition Width="*"></ColumnDefinition>
-        </Grid.ColumnDefinitions>
-
-        <DataGrid ItemsSource="{Binding Persons}" SelectedItem="{Binding PersonSelected}" AutoGenerateColumns="False">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="25"></RowDefinition>
+        </Grid.RowDefinitions>
+        <DockPanel>
+            <TextBox Margin="1"
+                             mah:TextBoxHelper.ButtonCommand="{Binding SearchCommand, Mode=OneWay}"
+                             mah:TextBoxHelper.ButtonCommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=TextBox}, Path=Text, Mode=OneWay}"
+                             mah:TextBoxHelper.ClearTextButton="False" 
+                             mah:TextBoxHelper.UseFloatingWatermark="True"
+                             mah:TextBoxHelper.Watermark="Cerca per nome..." >
+                <TextBox.InputBindings>
+                    <KeyBinding Key="Return"
+                                        Command="{Binding SearchCommand, Mode=OneWay}"
+                                        CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=TextBox}, Path=Text, Mode=OneWay}" />
+                </TextBox.InputBindings>
+                <TextBox.Style>
+                    <Style BasedOn="{StaticResource MahApps.Styles.TextBox.Search}" TargetType="{x:Type TextBox}">
+                        <Style.Triggers>
+                            <Trigger Property="mah:TextBoxHelper.HasText" Value="True">
+                                <Setter Property="mah:TextBoxHelper.ButtonContent" Value="r" />
+                                <Setter Property="mah:TextBoxHelper.ButtonContentTemplate" Value="{x:Null}" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBox.Style>
+            </TextBox>
+        </DockPanel>
+        <DataGrid Grid.Row="1" ItemsSource="{Binding Persons}" SelectedItem="{Binding PersonSelected}" AutoGenerateColumns="False">
             <DataGrid.Columns>
+                <DataGridTemplateColumn Header="" >
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button  Height="25" Width="25" Padding="2" 
+                                             Command="{Binding Path=DataContext.RemovePersonCommand, ElementName=root}" 
+                                             CommandParameter="{Binding .}" >
+                                <Path   Stretch="Fill"  Fill="Black" 
+                                                Data="M20,6H16V5a3,3,0,0,0-3-3H11A3,3,0,0,0,8,5V6H4A1,1,0,0,0,4,8H5V19a3,3,0,0,0,3,3h8a3,3,0,0,0,3-3V8h1a1,1,0,0,0,0-2ZM10,5a1,1,0,0,1,1-1h2a1,1,0,0,1,1,1V6H10Zm7,14a1,1,0,0,1-1,1H8a1,1,0,0,1-1-1V8H17Z">
+                                </Path>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTextColumn IsReadOnly="True" Header="Nome" Binding="{Binding Person.Name}"></DataGridTextColumn>
                 <DataGridTextColumn IsReadOnly="True" Header="Iscrizione" Binding="{Binding CertiFicateExpiration, StringFormat=d}"></DataGridTextColumn>
                 <DataGridTextColumn IsReadOnly="True" Header="Scad. Cert." Binding="{Binding CertiFicateExpiration, StringFormat=d}"></DataGridTextColumn>
                 <DataGridTextColumn IsReadOnly="True" Header="Debiti" Binding="{Binding Debit}"></DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
-        
+        <Button Grid.Row="2" Command="{Binding AddNewPersonCommand}">Aggiungi</Button>
         
         
     </Grid>

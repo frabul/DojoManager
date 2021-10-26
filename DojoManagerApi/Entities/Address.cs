@@ -18,16 +18,6 @@ namespace DojoManagerApi.Entities
         public virtual int Number { get; set; }
         public virtual string PostCode { get; set; }
     }
-    [AutomapIgnore]
-    public class AddressDetail : Address
-    {
-        public Address _Origin;
-        public object Origin => _Origin;
-        public override int Number { get => _Origin.Number; set => _Origin.Number = value; }
-        public override string Street { get => _Origin.Street; set => _Origin.Street = value; }
-        public AddressDetail(Address a)
-        {
-            _Origin = a;
-        }
-    }
+    
+  
 }

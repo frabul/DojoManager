@@ -33,7 +33,7 @@ namespace DojoManagerGui
                 (s, e) => 
                     Console.WriteLine($"{e} has changed.");
             proxy.Name = "asdasdasdasd";
-            MainWindow window = new MainWindow(); 
+            Window_Main window = new Window_Main(); 
             window.Show();
 
         }

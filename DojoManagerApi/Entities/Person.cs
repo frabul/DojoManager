@@ -12,9 +12,14 @@ namespace DojoManagerApi.Entities
         public virtual IList<Certificate> Certificates { get; set; } = new List<Certificate>();
         public virtual IList<Subscription> Subscriptions { get; set; } = new List<Subscription>();
         public virtual IList<Card> Cards { get; set; } = new List<Card>();
-    
+
         [AutomapIgnoreAttribute]
         public virtual Person Origin => this;
+
+        public virtual void RemoveCard(Card c)
+        {
+            Cards.Remove(c);
+        }
 
         //public virtual IList<Debit> Debits { get; set; } = new List<Debit>();
         public virtual void AddCard(Card card)
@@ -26,7 +31,15 @@ namespace DojoManagerApi.Entities
         {
             Certificates.Add(certificate);
         }
+        public virtual void RemoveCertificate(Certificate certificate)
+        {
+            Certificates.Remove(certificate);
+        }
 
+        public virtual void RemoveSubscription(Subscription s)
+        {
+            Subscriptions.Remove(s);
+        }
 
         public virtual void AddSubscription(Subscription subscription, int cost)
         {

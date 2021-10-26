@@ -52,6 +52,14 @@ namespace DojoManagerApi
     public class TestNHibernate
     {
         public const string DbFile = "KenseiDojoDb.db";
+
+        public void RemovePerson(Person person)
+        {
+            
+            CurrentSession.Delete((person as IEntityWrapper<Person>).Origin);
+            CurrentSession.Flush();
+        }
+
         public TestContext TestContext { get; set; }
 
         public ISessionFactory SessionFactory { get; private set; }
@@ -80,7 +88,7 @@ namespace DojoManagerApi
             p1.AddSubscription(new Subscription() { StartDate = Date(2021, 10), EndDate = Date(2022, 08), Type = SubscriptionType.Kensei_Dojo_Annual_Association, Notes = "Sec iscrizione" }, 360);
             p1.AddSubscription(new Subscription() { StartDate = Date(2020, 01), EndDate = Date(2021, 01), Type = SubscriptionType.CIK_Annual_Association, Notes = "Prima iscrizione" }, 25);
             p1.Subscriptions[0].Debit.AddPayment(new DebitPayment() { Amount = 360 });
-            p1.AddCard(new Card() { CardId = "1", Type = CardType.Kensei, Invalidated = true });
+            p1.AddCard(new Card() { CardId = "1111", Type = CardType.Kensei, Invalidated = true });
             var p2 = new Person
             {
                 Name = "Giulia Spadarella",
@@ -95,7 +103,7 @@ namespace DojoManagerApi
             p2.AddSubscription(new Subscription() { StartDate = Date(2021, 09), EndDate = Date(2022, 08), Type = SubscriptionType.Kensei_Dojo_Annual_Association, Notes = "Sec iscrizione" }, 360);
             p2.AddSubscription(new Subscription() { StartDate = Date(2021, 01), EndDate = Date(2022, 01), Type = SubscriptionType.CIK_Annual_Association, Notes = "CIK" }, 25);
             p2.Subscriptions[1].Debit.AddPayment(new DebitPayment() { Amount = 360 });
-            p2.AddCard(new Card() { CardId = "2", Type = CardType.CIK, Invalidated = true });
+            p2.AddCard(new Card() { CardId = "22222", Type = CardType.CIK, Invalidated = true });
             InitialPersons = new() { p1, p2 };
 
             InitialCashMovements = new()
@@ -181,7 +189,7 @@ namespace DojoManagerApi
             var persons = ListPersons();
             CompareToInitialSet(persons);
 
-            Initialize(); 
+            Initialize();
         }
         [TestMethod]
         public void Test2()
@@ -191,9 +199,9 @@ namespace DojoManagerApi
             Initialize();
             Populate();
 
-            
 
-            Close(); 
+
+            Close();
             Initialize();
 
             var persons = ListPersons();//.Select(p => EntityWrapper.Wrap(p) as Person).ToArray();
@@ -237,6 +245,11 @@ namespace DojoManagerApi
             {
                 var pi = InitialPersons[i];
                 var pn = persons[i];
+                var pdb = pn.Subscriptions[0].Debit.Person;
+                var debit_0_0 = pn.Subscriptions[0].Debit;
+                var payments = debit_0_0.Payments;
+                if (pi.TotalDue() != pn.TotalDue())
+                { }
                 Assert.AreEqual(pi.TotalDue(), pn.TotalDue());
                 Assert.IsTrue(pi.Subscriptions.Count == pn.Subscriptions.Count);
                 Assert.IsTrue(pi.Certificates.Count == pn.Certificates.Count);
@@ -248,7 +261,7 @@ namespace DojoManagerApi
                     for (int d = 0; d < pi.Subscriptions[s].Debit.Payments.Count; d++)
                         Assert.IsTrue(pi.Subscriptions[s].Debit.Payments[d].Amount == pn.Subscriptions[s].Debit.Payments[d].Amount);
 
-                } 
+                }
             }
         }
 
@@ -281,6 +294,13 @@ namespace DojoManagerApi
         public void Flush()
         {
             CurrentSession.Flush();
+        }
+
+        public Person AddNewPerson()
+        {
+            var p = new Person() { Name = "Jonhn Doe"};
+            CurrentSession.Save(p);
+            return p;
         }
     }
 

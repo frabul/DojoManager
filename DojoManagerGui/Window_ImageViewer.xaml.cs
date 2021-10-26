@@ -10,20 +10,18 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace DojoManagerGui
 {
     /// <summary>
-    /// Interaction logic for UC_ListPersons.xaml
+    /// Interaction logic for ImageViewer.xaml
     /// </summary>
-    public partial class UC_ListPersons : UserControl
+    public partial class Window_ImageViewer : MahApps.Metro.Controls.MetroWindow
     {
-        public UC_ListPersons()
+        public Window_ImageViewer()
         {
             InitializeComponent();
         }
- 
     }
 }

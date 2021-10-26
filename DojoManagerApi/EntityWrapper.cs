@@ -16,49 +16,6 @@ using System.Collections;
 
 namespace DojoManagerApi
 {
-    public class LinkedObservableCollection<T> : ObservableCollection<T>
-    {
-        IList<T> Origin;
-
-        public LinkedObservableCollection(IList<T> li) : base()
-        {
-            Origin = li;
-            foreach (var it in li)
-                this.Add(it);
-        }
-
-        protected override void ClearItems()
-        {
-            Origin.Clear();
-            base.ClearItems();
-        }
-
-        protected override void InsertItem(int index, T item)
-        {
-
-            Origin.Insert(index, item);
-            var wrapped = (T)EntityWrapper.Wrap(item);
-            base.InsertItem(index, wrapped);
-        }
-
-        protected override void MoveItem(int oldIndex, int newIndex)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void RemoveItem(int index)
-        {
-            Origin.RemoveAt(index);
-            base.RemoveItem(index);
-        }
-
-        protected override void SetItem(int index, T item)
-        {
-            Origin[index] = item;
-            var wrapped = (T)EntityWrapper.Wrap(item);
-            base.SetItem(index, wrapped);
-        }
-    }
     public interface IEntityWrapper<T>
     {
         T Origin { get; }
@@ -215,73 +172,100 @@ namespace DojoManagerApi
 
 
             //override get hash code
-            var oldGetHashCode = ot.GetMethod("GetHashCode");
-            var getHashCodeMethod = builder.NewMethod("GetHashCode")
-                .Returns(oldGetHashCode.ReturnType)
-                .MethodAttributes(oldGetHashCode.Attributes)
-                .CallingConvention(oldGetHashCode.CallingConvention)
-                    .Body()
-                        .LdArg0()
-                        .LdFld(originField)
-                        .CallVirt(oldGetHashCode)
-                        .Ret();
-            //override equals  
-            var oldEquals = ot.GetMethod("Equals", new[] { ot });
-            if (oldEquals != null)
-            {
-                var equalsMethod = builder.NewMethod("Equals")
-                    .Returns(oldEquals.ReturnType)
-                    .MethodAttributes(MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.HideBySig)
-                    .CallingConvention(oldEquals.CallingConvention)
-                    .Params(oldEquals.GetParameters().Select(p => p.ParameterType).ToArray())
-                        .Body()
-                            .DefineLabel(out ILabel lab1)
-                            //fist instance is always Origin
-                            .LdArg0()
-                            .LdFld(originField)
-                            //if arg1 is of type wrapper, load origin, otherwise load itself
-                            .LdArg1()
-                            .IsInst(builder.Define())
-                            .BrFalseS(lab1) //if cast is null jump 
-                                .LdArg1()
-                                .IsInst(builder.Define())
-                                .Call(oldEquals)
-                                .Ret()
-                            .MarkLabel(lab1)//arg1 is of base type
-                            .LdArg1()
-                            .Call(oldEquals)
-                            .Ret();
-            }
+            //var oldGetHashCode = ot.GetMethod("GetHashCode");
+            //var getHashCodeMethod = builder.NewMethod("GetHashCode")
+            //    .Returns(oldGetHashCode.ReturnType)
+            //    .MethodAttributes(oldGetHashCode.Attributes)
+            //    .CallingConvention(oldGetHashCode.CallingConvention)
+            //        .Body()
+            //            .LdArg0()
+            //            .LdFld(originField)
+            //            .CallVirt(oldGetHashCode)
+            //            .Ret();
+            ////override equals  
+            //var oldEquals = ot.GetMethod("Equals", new[] { ot });
+            //if (oldEquals != null)
+            //{
+            //    var equalsMethod = builder.NewMethod("Equals")
+            //        .Returns(oldEquals.ReturnType)
+            //        .MethodAttributes(MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.HideBySig)
+            //        .CallingConvention(oldEquals.CallingConvention)
+            //        .Params(oldEquals.GetParameters().Select(p => p.ParameterType).ToArray())
+            //            .Body()
+            //                .DefineLabel(out ILabel lab1)
+            //                //fist instance is always Origin
+            //                .LdArg0()
+            //                .LdFld(originField)
+            //                //if arg1 is of type wrapper, load origin, otherwise load itself
+            //                .LdArg1()
+            //                .IsInst(builder.Define())
+            //                .BrFalseS(lab1) //if cast is null jump 
+            //                    .LdArg1()
+            //                    .IsInst(builder.Define())
+            //                    .Call(oldEquals)
+            //                    .Ret()
+            //                .MarkLabel(lab1)//arg1 is of base type
+            //                .LdArg1()
+            //                .Call(oldEquals)
+            //                .Ret();
+            //}
 
             //intercept properties
             var properties = ot.GetProperties(BindingFlags.Instance /*| BindingFlags.NonPublic*/ | BindingFlags.Public).Where(p => p.GetMethod.IsVirtual).ToList();
             foreach (var prop in properties)
             {
+                if (prop.Name == nameof(IEntityWrapper<Person>.Origin))
+                    continue;
                 bool shouldWrapIt = NeedsWrapping(prop.PropertyType);
-                bool isCollection = prop.PropertyType.IsAssignableTo(typeof(ICollection));
                 var itemType = TypeUtils.GetElementType(prop.PropertyType);
+                bool isCollection = prop.PropertyType.IsAssignableTo(typeof(IList<>).MakeGenericType(itemType));
                 var newProperty = builder.NewProperty(prop.Name, prop.PropertyType);
+                var likedCollectionType = typeof(LinkedObservableCollection<>).MakeGenericType(itemType);
+                IFieldBuilder linkedCollectionField = null;
+                if (isCollection)
+                {
+                    //allocate a field to keep the linked collection instance
+                    linkedCollectionField = builder.NewField($"_{prop.Name}Linked", likedCollectionType);
+                }
                 var getter = newProperty.Getter()
                         .MethodAttributes(MethodAttributes.Virtual | MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig)
                         .Public()
                         .Returns(prop.PropertyType)
                         .Body(m =>
                         {
-                            m
-                           .LdArg0()
-                           .LdFld(originField)
-                           .Call(prop.GetMethod);
+
 
                             if (isCollection)
                             {
                                 //returns new LinkedObservableCollection
-                                var linkedCollectionCtor = typeof(LinkedObservableCollection<>).MakeGenericType(itemType).GetConstructors().First();
-                                m.Newobj(linkedCollectionCtor);
+                                var linkedCollectionCtor = likedCollectionType.GetConstructors().First();
+                                m
+                                .DefineLabel(out ILabel fieldNotNull)
+                                .LdArg0()
+                                .LdFld(linkedCollectionField)
+                                .BrTrueS(fieldNotNull) // if field is null
+                                    .LdArg0() //this will be used later by StFld 
+                                    .LdArg0()
+                                    .LdFld(originField)
+                                    .CallVirt(prop.GetMethod)
+                                    .Newobj(linkedCollectionCtor)
+                                    .StFld(linkedCollectionField)
+                                //if not null end
+                                .MarkLabel(fieldNotNull)
+                                .LdArg0()
+                                .LdFld(linkedCollectionField);
                             }
-                            else if (shouldWrapIt)
+                            else
                             {
-                                //return wrapped objec if the type is decorated by WrapMe
-                                m.Call(typeof(EntityWrapper).GetMethod("Wrap"));
+                                m
+                                .LdArg0()
+                                .LdFld(originField)
+                                .CallVirt(prop.GetMethod);
+                                if (shouldWrapIt)
+                                {
+                                    //return wrapped objec if the type is decorated by WrapMe 
+                                    m.Call(typeof(EntityWrapper).GetMethod("Wrap"));
+                                }
                             }
                             m.Ret();
                         }); ;
@@ -299,7 +283,7 @@ namespace DojoManagerApi
                             .LdArg0()
                             .LdFld(originField)
                             .LdArg1()
-                            .Call(prop.SetMethod)
+                            .CallVirt(prop.SetMethod)
                             //return if null
                             .LdArg0()
                             .LdFld(propertyChangedField)

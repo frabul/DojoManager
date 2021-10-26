@@ -19,9 +19,9 @@ namespace DojoManagerGui
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : MetroWindow
+    public partial class Window_Main : MetroWindow
     {
-        public MainWindow()
+        public Window_Main()
         {
             InitializeComponent();
         }

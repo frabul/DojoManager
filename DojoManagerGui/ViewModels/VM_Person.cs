@@ -15,12 +15,13 @@ namespace DojoManagerGui.ViewModels
         public VM_Person(Person person)
         {
             Person = (Person)EntityWrapper.Wrap(person);
+            var hash = Person.GetHashCode();
             Subscriptions = new VM_PersonSubscriptions(Person);
             AddNewCard = new RelayCommand(() => Person.AddCard(new Card()));
             RemoveCard = new RelayCommand<Card>(c => Person.RemoveCard(c));
             AddNewCertificate = new RelayCommand(() => Person.AddCertificate(new Certificate()));
             RemoveCertificate = new RelayCommand<Certificate>(c => Person.RemoveCertificate(c));
-
+            ShowCertificateImage = new RelayCommand<Certificate>(ShowImage);
             DispatcherTimer dispatcherTimer = new  DispatcherTimer();
           
             dispatcherTimer.Interval = TimeSpan.FromSeconds(0.3);
@@ -46,7 +47,17 @@ namespace DojoManagerGui.ViewModels
         public RelayCommand<Card> RemoveCard { get; }
         public RelayCommand AddNewCertificate { get; }
         public RelayCommand<Certificate> RemoveCertificate { get; }
+        public RelayCommand<Certificate> ShowCertificateImage { get; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
+
+
+        public void ShowImage(Certificate cert)
+        {
+            var vm = new VM_ImageViewer(cert.ImagePath);
+            var win  = new  Window_ImageViewer() {  DataContext = vm };
+            win.ShowDialog();
+            cert.ImagePath = vm.ImageFilePath;
+        }
     }
 }

@@ -25,7 +25,7 @@ namespace DojoManagerApi.Entities
 
         public virtual string PrintData()
         {
-            return $"Subscription #{Id}, Type:{Type}, Date:{StartDate}, Notes: {Notes}, Debit: {Debit}";
+            return $"Subscription #{Id}, Type:{Type}, Date:{StartDate}, Notes: {Notes}, Debit: {Debit.ToString()}";
         }
     }
 

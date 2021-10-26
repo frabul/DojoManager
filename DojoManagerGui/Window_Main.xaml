@@ -1,4 +1,4 @@
-﻿<mah:MetroWindow x:Class="DojoManagerGui.MainWindow"
+﻿<mah:MetroWindow x:Class="DojoManagerGui.Window_Main"
                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
@@ -17,22 +17,27 @@
             <ColumnDefinition Width="Auto" ></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-         
-        <Border BorderThickness="0,0,1,0" BorderBrush="DeepSkyBlue">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Border Grid.Row="1" BorderThickness="0,0,1,0" BorderBrush="DeepSkyBlue">
             <ListBox x:Name="Functions" 
                  Width="Auto" Margin="5"  
                  ItemsSource="{Binding FunctionPages}"  
                      SelectedItem="{Binding FunctionSelected}"
                  DisplayMemberPath="Name"  /> 
         </Border>
-        <mah:MetroContentControl Grid.Column="1" Content="{Binding FunctionSelected}" >
+        <mah:MetroContentControl Grid.Column="1" Grid.Row="1" Content="{Binding FunctionSelected}" >
             <ContentControl.Resources>
                 <DataTemplate DataType="{x:Type ViewModels:VM_ListPersons}">
                     <DockPanel  >
                         <GroupBox Header="Persone">
                             <local:UC_ListPersons></local:UC_ListPersons>
                         </GroupBox>
-                        <GroupBox Header="Dati Persona Selezionata"> 
+                        <GroupBox 
+                            HeaderStringFormat="DATI PERSONA SELEZIONATA ( {0} )"
+                            Header="{Binding PersonSelected.Person.Name, StringFormat=Dati Persona Selezionata{0}}" Margin="1,0,0,0"> 
                             <local:UC_PersonView DataContext="{Binding PersonSelected}" ></local:UC_PersonView>
                         </GroupBox>
                     </DockPanel>

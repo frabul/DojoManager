@@ -12,7 +12,7 @@ namespace DojoManagerApi.Entities
         public virtual DateTime ExpirationDate { get; set; }
         public virtual CardType Type { get; set; }
         public virtual bool Invalidated { get; set; }
-
+        public virtual string Notes { get; set; }
         public override string ToString()
         {
             return $"{{ Id:{Id}, Type:{Type}, CardId: {CardId}, Year:{ValidityStartDate:yyyy}, Disabled: {Invalidated} }}";
