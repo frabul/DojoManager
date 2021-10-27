@@ -55,6 +55,8 @@ namespace DojoManagerApi
 
         public static object Wrap(object entity)
         {
+            if (entity == null)
+                return null;
             //DebugOutput.Output = new ConsoleOutput(); 
             Type ot = entity.GetType();
 

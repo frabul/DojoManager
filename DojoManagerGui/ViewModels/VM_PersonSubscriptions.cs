@@ -15,8 +15,10 @@ namespace DojoManagerGui.ViewModels
     {
         public Person Person { get; set; }
 
-        public RelayCommand Add { get; }
-        public RelayCommand<Subscription> Remove { get; }
+        public RelayCommand AddSubscriptionCommand { get; }
+        public RelayCommand<Subscription> RemoveSubscriptionCommand { get; }
+        public RelayCommand<Subscription> AddPaymentCommand { get; }
+
         public IList<Subscription> Subscriptions => Person.Subscriptions;
         public string[] DefaultSubscriptions { get; } = new string[] { "Iscrizione annuale Kensei Dojo", "Iscrizione annuale CIK" };
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -25,12 +27,15 @@ namespace DojoManagerGui.ViewModels
         {
 
             Person = (Person)EntityWrapper.Wrap(person);
-            Add = new RelayCommand(
+            AddSubscriptionCommand = new RelayCommand(
                     () => Person.AddSubscription(new Subscription(), 0),
                     () => Person != null);
 
-            Remove = new RelayCommand<Subscription>(
+            RemoveSubscriptionCommand = new RelayCommand<Subscription>(
                     s => Person.RemoveSubscription(s)
+                );
+            AddPaymentCommand = new RelayCommand<Subscription>(
+                    s => s.Debit.AddPayment(0, DateTime.Now)
                 );
         }
 

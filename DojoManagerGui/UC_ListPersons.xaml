@@ -17,16 +17,13 @@
             <RowDefinition Height="25"></RowDefinition>
         </Grid.RowDefinitions>
         <DockPanel>
-            <TextBox Margin="1"
-                             mah:TextBoxHelper.ButtonCommand="{Binding SearchCommand, Mode=OneWay}"
-                             mah:TextBoxHelper.ButtonCommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=TextBox}, Path=Text, Mode=OneWay}"
-                             mah:TextBoxHelper.ClearTextButton="False" 
+            <TextBox Margin="1" Text="{Binding NameFilterString, UpdateSourceTrigger=PropertyChanged}"
+                             mah:TextBoxHelper.ButtonCommand="{Binding SearchCommand, Mode=OneWay}" 
+                             mah:TextBoxHelper.ClearTextButton="True" 
                              mah:TextBoxHelper.UseFloatingWatermark="True"
                              mah:TextBoxHelper.Watermark="Cerca per nome..." >
                 <TextBox.InputBindings>
-                    <KeyBinding Key="Return"
-                                        Command="{Binding SearchCommand, Mode=OneWay}"
-                                        CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=TextBox}, Path=Text, Mode=OneWay}" />
+                    <KeyBinding Key="Return" Command="{Binding SearchCommand, Mode=OneWay}" />
                 </TextBox.InputBindings>
                 <TextBox.Style>
                     <Style BasedOn="{StaticResource MahApps.Styles.TextBox.Search}" TargetType="{x:Type TextBox}">

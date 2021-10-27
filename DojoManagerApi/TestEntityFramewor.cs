@@ -12,7 +12,7 @@ namespace DojoManagerApi
 {
     public class DojoManagerContext : DbContext
     {
-        public DbSet<JuridicalEntity> Subjects { get; set; }
+        public DbSet<Subject> Subjects { get; set; }
         public DbSet<CashFlow> Transactions { get; set; }
         public DbSet<Person> Persons { get; set; }
         public string DbPath { get; private set; }
@@ -99,7 +99,7 @@ namespace DojoManagerApi
             }
         }
 
-        public IEnumerable<JuridicalEntity> ListSubjects()
+        public IEnumerable<Subject> ListSubjects()
         {
             using (var sess = new DojoManagerContext())
             {

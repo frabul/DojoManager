@@ -6,13 +6,12 @@ using System.Text;
 namespace DojoManagerApi.Entities
 {
     [WrapMe]
-    public class Person : JuridicalEntity, IEntityWrapper<Person>
+    public class Person : Subject, IEntityWrapper<Person>
     {
         public virtual DateTime BirthDate { get; set; }
         public virtual IList<Certificate> Certificates { get; set; } = new List<Certificate>();
         public virtual IList<Subscription> Subscriptions { get; set; } = new List<Subscription>();
-        public virtual IList<Card> Cards { get; set; } = new List<Card>();
-
+        public virtual IList<Card> Cards { get; set; } = new List<Card>(); 
         [AutomapIgnoreAttribute]
         public virtual Person Origin => this;
 
@@ -43,7 +42,7 @@ namespace DojoManagerApi.Entities
 
         public virtual void AddSubscription(Subscription subscription, int cost)
         {
-            var deb = new Debit() { Amount = cost, Person = this, Subscription = subscription };
+            var deb = new Debit() { Amount = cost, Person = Origin };
             subscription.Debit = deb;
             subscription.Person = Origin;
             Subscriptions.Add(subscription);

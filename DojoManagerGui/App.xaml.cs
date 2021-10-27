@@ -32,7 +32,7 @@ namespace DojoManagerGui
             (proxy as INotifyPropertyChanged).PropertyChanged +=
                 (s, e) => 
                     Console.WriteLine($"{e} has changed.");
-            proxy.Name = "asdasdasdasd";
+       
             Window_Main window = new Window_Main(); 
             window.Show();
 
