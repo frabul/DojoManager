@@ -13,7 +13,7 @@ namespace DojoManagerApi
     public class DojoManagerContext : DbContext
     {
         public DbSet<Subject> Subjects { get; set; }
-        public DbSet<CashFlow> Transactions { get; set; }
+        public DbSet<MoneyMovement> Transactions { get; set; }
         public DbSet<Person> Persons { get; set; }
         public string DbPath { get; private set; }
 

@@ -11,25 +11,78 @@
                  >
     <mah:MetroWindow.Resources>
         <ViewModels:VM_MainWindow x:Key="vm"/>
+        <Style x:Key="VerticalHeader" TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground"  Value="{DynamicResource MahApps.Brushes.Badged.Foreground}"></Setter>
+            <Setter Property="Background"  Value="{DynamicResource MahApps.Brushes.Accent}"></Setter>
+            <Setter Property="HorizontalAlignment"   Value="Stretch"></Setter>
+            <Setter Property="TextAlignment"   Value="Center"></Setter>
+        </Style>
     </mah:MetroWindow.Resources>
     <Grid DataContext="{StaticResource vm}">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" ></ColumnDefinition>
-            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*" ></ColumnDefinition>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="1"></RowDefinition>
-            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*" ></RowDefinition>
         </Grid.RowDefinitions>
-        <Border Grid.Row="1" BorderThickness="0,0,1,0" BorderBrush="DeepSkyBlue">
-            <ListBox x:Name="Functions" 
-                 Width="Auto" Margin="5"  
-                 ItemsSource="{Binding FunctionPages}"  
-                     SelectedItem="{Binding FunctionSelected}"
-                 DisplayMemberPath="Name"  /> 
+        <Border  Margin="1" BorderThickness="1" BorderBrush="{DynamicResource MahApps.Brushes.Accent}"  >
+            <Grid Name="GridMenu"  Height="Auto">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="30"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Style="{StaticResource VerticalHeader}">M</TextBlock>
+                    <TextBlock Style="{StaticResource VerticalHeader}">E</TextBlock>
+                    <TextBlock Style="{StaticResource VerticalHeader}">N</TextBlock>
+                    <TextBlock Style="{StaticResource VerticalHeader}">U</TextBlock>
+                </StackPanel>
+
+                <ListBox Grid.Column="1" x:Name="DefaultTabControl"
+                        VerticalAlignment="Stretch" 
+                        ItemsSource="{Binding FunctionPages}"
+                        SelectedItem="{Binding FunctionSelected}"  >
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel IsItemsHost="True" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                          
+                                <Grid Height="{Binding ElementName=GridMenu, Path=ActualHeight}" >
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="50" />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions> 
+                                    <ContentControl   Height="35" Width="35" >
+                                        <Path Stretch="Uniform"  Fill="Black" 
+                                               Data="{Binding IconPath}" >
+                                        </Path>
+                                    </ContentControl>
+                                    <TextBlock Grid.Column="1"
+                                   VerticalAlignment="Center"
+                                   FontSize="23" 
+                                   Text="{Binding Name}" Padding="10"/>
+                                </Grid>
+                      
+
+                        </DataTemplate>
+
+                    </ListBox.ItemTemplate>
+
+                </ListBox>
+            </Grid> 
+        
+            
         </Border>
-        <mah:MetroContentControl Grid.Column="1" Grid.Row="1" Content="{Binding FunctionSelected}" >
+        <ContentControl Content="{Binding FunctionSelected}"
+                        Margin="1,0,1,1"
+                        Grid.Row="1">
             <ContentControl.Resources>
+                <!--Template for VM_ListPersons-->
                 <DataTemplate DataType="{x:Type ViewModels:VM_ListPersons}">
                     <DockPanel  >
                         <GroupBox Header="Persone">
@@ -37,14 +90,24 @@
                         </GroupBox>
                         <GroupBox 
                             HeaderStringFormat="DATI PERSONA SELEZIONATA ( {0} )"
-                            Header="{Binding PersonSelected.Person.Name, StringFormat=Dati Persona Selezionata{0}}" Margin="1,0,0,0"> 
+                            Header="{Binding PersonSelected.Person.Name, StringFormat=Dati Persona Selezionata{0}}" Margin="1,0,0,0">
                             <local:UC_PersonView DataContext="{Binding PersonSelected}" ></local:UC_PersonView>
                         </GroupBox>
-                    </DockPanel>
-                        
+                    </DockPanel> 
+                </DataTemplate>
+                <!--Template for VM_ListPersons-->
+                <DataTemplate DataType="{x:Type ViewModels:VM_MoneyMovements}"> 
+                    <GroupBox Header="Entrate/Uscite">
+                        <local:UC_MoneyMovements></local:UC_MoneyMovements>
+                    </GroupBox>
                 </DataTemplate>
             </ContentControl.Resources>
-        </mah:MetroContentControl>
+        </ContentControl>
+
+
+
+
+
 
     </Grid>
 </mah:MetroWindow>

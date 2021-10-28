@@ -1,6 +1,7 @@
 ﻿using DojoManagerApi.Entities;
 using FluentNHibernate;
 using FluentNHibernate.Automapping;
+using FluentNHibernate.Automapping.Alterations;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
 using FluentNHibernate.Conventions.Helpers;
@@ -18,7 +19,24 @@ using System.Threading.Tasks;
 
 namespace DojoManagerApi
 {
+    [AutomapIgnore]
+    public class PersonMappingOverride : IAutoMappingOverride<Person>
+    {
+        public void Override(AutoMapping<Person> mapping)
+        {
+            mapping.HasMany(p => p.Certificates).Cascade.AllDeleteOrphan().Inverse();
+            mapping.HasMany(p => p.Subscriptions).Cascade.AllDeleteOrphan().Inverse();
+            mapping.HasMany(p => p.Cards).Cascade.AllDeleteOrphan().Inverse();
+        }
+    }
+    public class SubscriptionMappingOverride : IAutoMappingOverride<Subscription>
+    {
+        public void Override(AutoMapping<Subscription> mapping)
+        {
+            mapping.HasOne(e => e.Debit).Cascade.AllDeleteOrphan();
 
+        }
+    }
     public class SqlStatementInterceptor : EmptyInterceptor
     {
         public override NHibernate.SqlCommand.SqlString OnPrepareStatement(NHibernate.SqlCommand.SqlString sql)
@@ -75,13 +93,33 @@ namespace DojoManagerApi
 
         private DateTime Date(int year, int month) => new DateTime(year, month, 01);
         List<Person> InitialPersons;
-        List<CashFlow> InitialCashMovements;
+        List<MoneyMovement> InitialCashMovements;
 
         public TestNHibernate()
         {
             CreateInitialData();
         }
+        public void Initialize()
+        {
+            Close();
+            SessionFactory = null;
+            var cfg = new StoreConfiguration();
+            var autoMaps =
+                AutoMap.AssemblyOf<TestNHibernate>(cfg)
+                        .Conventions.Add(DefaultCascade.SaveUpdate())
+                        .UseOverridesFromAssemblyOf<TestNHibernate>();
 
+            SessionFactory = Fluently.Configure()
+                            .Database(SQLiteConfiguration.Standard.UsingFile(DbFile))
+                            .Mappings(m =>
+                                     m.AutoMappings.Add(autoMaps)
+                                    .ExportTo(@".\")
+                                    )
+                            .ExposeConfiguration(ConfigHandler)
+                            .BuildSessionFactory();
+
+            CurrentSession = SessionFactory.OpenSession();
+        }
         private void CreateInitialData()
         {
             var p1 = new Person
@@ -95,7 +133,7 @@ namespace DojoManagerApi
             p1.AddCertificate(new Certificate { Expiry = DateTime.Now.AddMonths(7), IsCompetitive = true });
             p1.AddSubscription(new Subscription() { StartDate = Date(2021, 10), EndDate = Date(2022, 08), Type = SubscriptionType.Kensei_Dojo_Annual_Association, Notes = "Sec iscrizione" }, 360);
             p1.AddSubscription(new Subscription() { StartDate = Date(2020, 01), EndDate = Date(2021, 01), Type = SubscriptionType.CIK_Annual_Association, Notes = "Prima iscrizione" }, 25);
-            p1.Subscriptions[0].Debit.AddPayment(360, DateTime.Now);
+            p1.Subscriptions[0].Debit.AddPayment(360, DateTime.Now, p1.Origin);
             p1.AddCard(new Card() { CardId = "1111", Type = CardType.Kensei, Invalidated = true });
             var p2 = new Person
             {
@@ -110,35 +148,18 @@ namespace DojoManagerApi
             p2.AddSubscription(new Subscription() { StartDate = Date(2020, 10), EndDate = Date(2021, 08), Type = SubscriptionType.Kensei_Dojo_Annual_Association, Notes = "Prima iscrizione" }, 400);
             p2.AddSubscription(new Subscription() { StartDate = Date(2021, 09), EndDate = Date(2022, 08), Type = SubscriptionType.Kensei_Dojo_Annual_Association, Notes = "Sec iscrizione" }, 360);
             p2.AddSubscription(new Subscription() { StartDate = Date(2021, 01), EndDate = Date(2022, 01), Type = SubscriptionType.CIK_Annual_Association, Notes = "CIK" }, 25);
-            p2.Subscriptions[1].Debit.AddPayment(360, DateTime.Now);
+            p2.Subscriptions[1].Debit.AddPayment(360, DateTime.Now, p2.Origin);
+
             p2.AddCard(new Card() { CardId = "22222", Type = CardType.CIK, Invalidated = true });
             InitialPersons = new() { p1, p2 };
 
             InitialCashMovements = new()
             {
-                new CashFlow() { Amount = 100, Date = DateTime.Now, Direction = CashFlowDirection.Out, Notes = "affitto agosto" }
+                new MoneyMovement() { Amount = 100, Date = DateTime.Now, Direction = CashFlowDirection.Out, Notes = "affitto agosto" }
             };
         }
 
-        public void Initialize()
-        {
-            Close();
-            SessionFactory = null;
-            var cfg = new StoreConfiguration();
-            var autoMaps =
-                AutoMap.AssemblyOf<TestNHibernate>(cfg)
-                        .Conventions.Add(DefaultCascade.All());
-            SessionFactory = Fluently.Configure()
-                            .Database(SQLiteConfiguration.Standard.UsingFile(DbFile))
-                            .Mappings(m =>
-                                     m.AutoMappings.Add(autoMaps)
-                                    .ExportTo(@".\")
-                                    )
-                            .ExposeConfiguration(ConfigHandler)
-                            .BuildSessionFactory();
 
-            CurrentSession = SessionFactory.OpenSession();
-        }
 
         private static void ConfigHandler(Configuration config)
         {
@@ -177,11 +198,11 @@ namespace DojoManagerApi
         {
             p.Name = "spastico";
             p.BirthDate = new DateTime(1987, 1, 1);
-            p.Certificates.RemoveAt(0);
-            //p.AddCertificate(new Certificate() { Expiry = DateTime.Now.AddYears(1), IsCompetitive = false });
-            //p.AddCard(new Card() { CardId = "asd asd asd", ValidityStartDate = DateTime.Now });
-            //p.Cards.RemoveAt(0);
-            //p.AddSubscription(new Subscription() { Type = SubscriptionType.CIK_Annual_Association }, 156);
+            p.RemoveCertificate(p.Certificates[0]);
+            p.AddCertificate(new Certificate() { Expiry = DateTime.Now.AddYears(1), IsCompetitive = false });
+            p.AddCard(new Card() { CardId = "asd asd asd", ValidityStartDate = DateTime.Now });
+            p.RemoveCard(p.Cards[0]);
+            p.AddSubscription(new Subscription() { Type = SubscriptionType.CIK_Annual_Association }, 156);
         }
         [TestMethod]
         public void Test1()
@@ -196,7 +217,7 @@ namespace DojoManagerApi
             Initialize();
             var persons = ListPersons();
             CompareToInitialSet(persons);
-
+            Flush();
             Initialize();
         }
         [TestMethod]
@@ -219,6 +240,7 @@ namespace DojoManagerApi
             Flush();
             Initialize();
 
+            var newPersons = ListPersons();
             CompareToInitialSet(ListPersons());
             CompareToInitialSet(ListPersons().Select(p => EntityWrapper.Wrap(p) as Person).ToList());
         }
@@ -243,6 +265,48 @@ namespace DojoManagerApi
             CompareToInitialSet(ListPersons());
             CompareToInitialSet(ListPersons().Select(p => EntityWrapper.Wrap(p) as Person).ToList());
         }
+
+        [TestMethod]
+        public void Test_Deletions()
+        {
+
+            DeleteDb();
+            Initialize();
+            Populate();
+            Close();
+
+            Initialize();
+            var person = CurrentSession.Query<Person>().First();
+            var personId = person.Id;
+            var certRemoved = person.Certificates.First();
+            var cardRemoved = person.Cards.First();
+            var subRemoved = person.Subscriptions.First();
+            var debRemoved = subRemoved.Debit.Id;
+            var payments = subRemoved.Debit.Payments.ToArray();
+            person.RemoveCard(cardRemoved);
+            person.RemoveCertificate(certRemoved);
+            person.RemoveSubscription(subRemoved);
+            Flush();
+            Close();
+
+            Initialize();
+            var person2 = CurrentSession.Get<Person>(person.Id);
+            var cert2 = CurrentSession.Get<Certificate>(certRemoved.Id);
+            var card2 = CurrentSession.Get<Card>(cardRemoved.Id);
+            var sub2 = CurrentSession.Get<Subscription>(subRemoved.Id);
+            var deb2 = CurrentSession.Get<Debit>(debRemoved);
+            Assert.IsNotNull(person2);
+            Assert.IsNull(cert2);
+            Assert.IsNull(card2);
+            Assert.IsNull(sub2);
+            Assert.IsNull(deb2);
+            foreach (var pay in payments)
+            {
+                Assert.IsNotNull(CurrentSession.Get<DebitPayment>(pay.Id));
+            }
+
+        }
+
         private void CompareToInitialSet(List<Person> persons)
         {
             foreach (var p in persons)
@@ -253,7 +317,7 @@ namespace DojoManagerApi
             {
                 var pi = InitialPersons[i];
                 var pn = persons[i];
-                var pdb = pn.Subscriptions[0].Debit.Person;
+                //var pdb = pn.Subscriptions[0].Debit.Person;
                 var debit_0_0 = pn.Subscriptions[0].Debit;
                 var payments = debit_0_0.Payments;
                 if (pi.TotalDue() != pn.TotalDue())
@@ -309,6 +373,11 @@ namespace DojoManagerApi
             var p = new Person() { Name = "Jonhn Doe" };
             CurrentSession.Save(p);
             return p;
+        }
+
+        public List<MoneyMovement> GetMoneyMovements()
+        {
+            return CurrentSession.Query<MoneyMovement>().ToList();
         }
     }
 

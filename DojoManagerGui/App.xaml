@@ -7,13 +7,31 @@
         
 
         <ResourceDictionary>
+            <Path x:Key="deleteIconPath" Stretch="Uniform" Fill="Black" 
+                    Data="M20,6H16V5a3,3,0,0,0-3-3H11A3,3,0,0,0,8,5V6H4A1,1,0,0,0,4,8H5V19a3,3,0,0,0,3,3h8a3,3,0,0,0,3-3V8h1a1,1,0,0,0,0-2ZM10,5a1,1,0,0,1,1-1h2a1,1,0,0,1,1,1V6H10Zm7,14a1,1,0,0,1-1,1H8a1,1,0,0,1-1-1V8H17Z">
+            </Path>
             <Style x:Key="ControlBaseStyle" TargetType="{x:Type Control}">
                 <Setter Property="Margin" Value="50" />
+            </Style>
+            <Style x:Key="DeleteIconPathStyle" TargetType="{x:Type Path}">
+                <Setter Property="Stretch" Value="Uniform"></Setter>
+                <Setter Property="Fill" Value="Black"></Setter>
+                <Setter Property="Data" Value="M20,6H16V5a3,3,0,0,0-3-3H11A3,3,0,0,0,8,5V6H4A1,1,0,0,0,4,8H5V19a3,3,0,0,0,3,3h8a3,3,0,0,0,3-3V8h1a1,1,0,0,0,0-2ZM10,5a1,1,0,0,1,1-1h2a1,1,0,0,1,1,1V6H10Zm7,14a1,1,0,0,1-1,1H8a1,1,0,0,1-1-1V8H17Z"></Setter>
+            </Style>
+            <Style TargetType="{x:Type Button}" x:Key="DeleteButtonStyle" >
+                <Setter Property="Width" Value="23"></Setter>
+                <Setter Property="Height" Value="23"></Setter>
+                <Setter Property="Content">
+                    <Setter.Value>
+                        <Path Style="{StaticResource DeleteIconPathStyle}" />
+                    </Setter.Value>
+                </Setter>
             </Style>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
+                
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

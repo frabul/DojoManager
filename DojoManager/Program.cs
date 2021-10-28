@@ -24,6 +24,8 @@ namespace DojoManager
             Db.Test1();
             Db.Test2();
             Db.Test3();
+            Db.Test_Deletions();
+
             Db.DeleteDb();
             Db.Initialize();
             Db.Populate();

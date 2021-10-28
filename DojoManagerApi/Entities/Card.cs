@@ -7,6 +7,7 @@ namespace DojoManagerApi.Entities
     public class Card
     {
         public virtual int Id { get; set; }
+        public virtual Person Person { get; set; }
         public virtual string CardId { get; set; }
         public virtual DateTime ValidityStartDate { get; set; }
         public virtual DateTime ExpirationDate { get; set; }

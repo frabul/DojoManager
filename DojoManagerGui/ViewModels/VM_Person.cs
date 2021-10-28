@@ -16,6 +16,7 @@ namespace DojoManagerGui.ViewModels
     {
         public VM_Person(Person person)
         {
+           
             Person = (Person)EntityWrapper.Wrap(person);
             var hash = Person.GetHashCode();
             AddNewCard = new RelayCommand(() => Person.AddCard(new Card()));
@@ -35,7 +36,7 @@ namespace DojoManagerGui.ViewModels
                     {
                         if (s != null)
                         {
-                            s.Debit.AddPayment(0, DateTime.Now);
+                            s.Debit.AddPayment(0, DateTime.Now, Person.Origin);
                             this.OnPropertyChanged(nameof(Payments));
                         }
                     }

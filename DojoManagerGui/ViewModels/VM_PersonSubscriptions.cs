@@ -35,7 +35,7 @@ namespace DojoManagerGui.ViewModels
                     s => Person.RemoveSubscription(s)
                 );
             AddPaymentCommand = new RelayCommand<Subscription>(
-                    s => s.Debit.AddPayment(0, DateTime.Now)
+                    s => s.Debit.AddPayment(0, DateTime.Now, Person.Origin)
                 );
         }
 
