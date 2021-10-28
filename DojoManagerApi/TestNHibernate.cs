@@ -1,7 +1,5 @@
 ﻿using DojoManagerApi.Entities;
-using FluentNHibernate;
 using FluentNHibernate.Automapping;
-using FluentNHibernate.Automapping.Alterations;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
 using FluentNHibernate.Conventions.Helpers;
@@ -19,24 +17,6 @@ using System.Threading.Tasks;
 
 namespace DojoManagerApi
 {
-    [AutomapIgnore]
-    public class PersonMappingOverride : IAutoMappingOverride<Person>
-    {
-        public void Override(AutoMapping<Person> mapping)
-        {
-            mapping.HasMany(p => p.Certificates).Cascade.AllDeleteOrphan().Inverse();
-            mapping.HasMany(p => p.Subscriptions).Cascade.AllDeleteOrphan().Inverse();
-            mapping.HasMany(p => p.Cards).Cascade.AllDeleteOrphan().Inverse();
-        }
-    }
-    public class SubscriptionMappingOverride : IAutoMappingOverride<Subscription>
-    {
-        public void Override(AutoMapping<Subscription> mapping)
-        {
-            mapping.HasOne(e => e.Debit).Cascade.AllDeleteOrphan();
-
-        }
-    }
     public class SqlStatementInterceptor : EmptyInterceptor
     {
         public override NHibernate.SqlCommand.SqlString OnPrepareStatement(NHibernate.SqlCommand.SqlString sql)
@@ -46,24 +26,6 @@ namespace DojoManagerApi
             return sql;
         }
 
-    }
-
-    public class StoreConfiguration : DefaultAutomappingConfiguration
-    {
-        public override bool ShouldMap(Type type)
-        {
-            var ignoreByAttribute = type.GetCustomAttributes(typeof(AutomapIgnoreAttribute), true).Any();
-            return !ignoreByAttribute && !type.FullName.Contains('+') && type.Namespace == "DojoManagerApi.Entities" && !type.IsEnum;
-        }
-        public override bool ShouldMap(Member member)
-        {
-            var ignoreByAttribute = member.MemberInfo.GetCustomAttributes(typeof(AutomapIgnoreAttribute), true).Any();
-            return !ignoreByAttribute && base.ShouldMap(member);
-        }
-        public override bool IsComponent(Type type)
-        {
-            return type == typeof(Address);
-        }
     }
 
     [TestClass()]
@@ -105,7 +67,7 @@ namespace DojoManagerApi
         {
             Close();
             SessionFactory = null;
-            var cfg = new StoreConfiguration();
+            var cfg = new NhibernateAutomappingConfig();
             var autoMaps =
                 AutoMap.AssemblyOf<TestNHibernate>(cfg)
                         .Conventions.Add(DefaultCascade.SaveUpdate())
