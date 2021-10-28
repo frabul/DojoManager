@@ -40,10 +40,17 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Soggetto" Binding="{Binding Movement.Counterpart.Name}"></DataGridTextColumn>
-                <DataGridTextColumn Header="Data" Binding="{Binding Movement.Date}"></DataGridTextColumn>
+                <DataGridTemplateColumn Header="Data"  >
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ContentPresenter Content="{Binding Movement.Date}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTextColumn Header="In/Out" Binding="{Binding Movement.Direction}"></DataGridTextColumn>
                 <DataGridTextColumn Header="Somma" Binding="{Binding Movement.Amount}"></DataGridTextColumn>
-                <DataGridTextColumn Header="Note" Binding="{Binding Movement.Notes}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Note" Width="1*" MinWidth="200" Binding="{Binding Movement.Notes}"></DataGridTextColumn>
+                
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

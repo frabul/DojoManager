@@ -116,8 +116,21 @@
                             </DataGridTemplateColumn>
                             <DataGridTextColumn Header="Id" Binding="{Binding Debit.Id}"></DataGridTextColumn>
                             <DataGridTextColumn Header="Tipo" Binding="{Binding Type }"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Inizio" Binding="{Binding StartDate, StringFormat=d}"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Fine" Binding="{Binding EndDate, StringFormat=d}"></DataGridTextColumn>
+                            <DataGridTemplateColumn Header="Inizio" >
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ContentPresenter Content="{Binding StartDate}"/>  
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <!--Binding="{Binding StartDate, StringFormat=d}"--> 
+                            <DataGridTemplateColumn Header="Fine"  >
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ContentPresenter Content="{Binding EndDate}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                             <DataGridTextColumn Header="Costo" Binding="{Binding Debit.Amount }"></DataGridTextColumn>
 
                             <DataGridTextColumn Header="Note" Width="1*" MinWidth="200" Binding="{Binding Notes}">
@@ -155,8 +168,20 @@
                             </DataGridTemplateColumn>
                             <DataGridTextColumn Header="Tipo" Binding="{Binding  Type }"></DataGridTextColumn>
                             <DataGridTextColumn Header="Codice" Binding="{Binding CardId }"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Inizio" Binding="{Binding ValidityStartDate, StringFormat=d}"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Fine" Binding="{Binding ExpirationDate, StringFormat=d}"></DataGridTextColumn>
+                            <DataGridTemplateColumn Header="Inizio">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ContentPresenter Content="{Binding ValidityStartDate}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Fine"  >
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ContentPresenter Content="{Binding ExpirationDate}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                             <DataGridCheckBoxColumn  Header="Invalidata" Binding="{Binding Invalidated}"></DataGridCheckBoxColumn>
                             <DataGridTextColumn Header="Note" Width="1*" MinWidth="200" Binding="{Binding Notes}">
 
@@ -193,7 +218,13 @@
                             </DataGridTemplateColumn>
 
                             <DataGridCheckBoxColumn Header="Sportivo" Binding="{Binding  IsCompetitive }"></DataGridCheckBoxColumn>
-                            <DataGridTextColumn Header="Scadenza" Binding="{Binding  Expiry, StringFormat=d}"></DataGridTextColumn>
+                            <DataGridTemplateColumn Header="Scadenza" >
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ContentPresenter Content="{Binding Expiry}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                             <DataGridTemplateColumn Header="Immagine">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -240,7 +271,13 @@
                             </DataGridTemplateColumn>
                             <DataGridTextColumn Header="Id Sott." Binding="{Binding Debit.Id}" IsReadOnly="True"></DataGridTextColumn>
                             <DataGridTextColumn Header="Somma" Binding="{Binding Amount}"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Data" Binding="{Binding Date, StringFormat=d}"></DataGridTextColumn>
+                            <DataGridTemplateColumn Header="Data" >
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ContentPresenter Content="{Binding Date}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                             <DataGridTextColumn Header="Note" Width="1*" MinWidth="200" Binding="{Binding Notes}"></DataGridTextColumn>
                         </DataGrid.Columns>
                     </DataGrid>
