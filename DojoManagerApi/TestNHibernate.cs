@@ -155,7 +155,7 @@ namespace DojoManagerApi
 
             InitialCashMovements = new()
             {
-                new MoneyMovement() { Amount = 100, Date = DateTime.Now, Direction = CashFlowDirection.Out, Notes = "affitto agosto" }
+                new MoneyMovement() { Amount = 100, Date = DateTime.Now, Direction = MoneyMovementDirection.Out, Notes = "affitto agosto" }
             };
         }
 

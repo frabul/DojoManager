@@ -9,7 +9,7 @@
         public virtual Debit Debit { get; set; }   
         public DebitPayment()
         {
-            Direction = CashFlowDirection.In;
+            Direction = MoneyMovementDirection.In;
         } 
     }
 }

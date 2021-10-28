@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:DojoManagerGui" 
              xmlns:viewmodels="clr-namespace:DojoManagerGui.ViewModels" 
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:entities="clr-namespace:DojoManagerApi.Entities;assembly=DojoManagerApi"
              d:DataContext="{d:DesignInstance Type=viewmodels:VM_MoneyMovements}"
              mc:Ignorable="d" 
              d:DesignHeight="450" 
@@ -39,16 +40,28 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Header="Soggetto" Binding="{Binding Movement.Counterpart.Name}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Soggetto" Binding="{Binding Movement.Counterpart.Name}" IsReadOnly="True"></DataGridTextColumn>
                 <DataGridTemplateColumn Header="Data" SortMemberPath="Movement.Date" >
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <DatePicker Width="100" SelectedDate="{Binding Movement.Date, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" ></DatePicker>
+                            <DatePicker Background="Transparent" Width="100" SelectedDate="{Binding Movement.Date, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" ></DatePicker>
                             <!--<ContentPresenter Content="{Binding Movement.Date}"/>-->
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn> 
-                <DataGridTextColumn Header="In/Out" Binding="{Binding Movement.Direction}"></DataGridTextColumn>
+                <!--<DataGridTextColumn Header="In/Out" Binding="{Binding Movement.Direction}"></DataGridTextColumn>-->
+                <DataGridTemplateColumn Header="In/Out"  >
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ComboBox Background="Transparent"
+                                        ItemsSource="{Binding Source={local:Enumeration {x:Type entities:MoneyMovementDirection}}}"
+                                      SelectedValue="{Binding Movement.Direction, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  
+                                      DisplayMemberPath="Description" 
+                                      SelectedValuePath="Value" > 
+                            </ComboBox>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Somma" Binding="{Binding Movement.Amount}"></DataGridTextColumn>
                 <DataGridTextColumn Header="Note" Width="1*" MinWidth="200" Binding="{Binding Movement.Notes}"></DataGridTextColumn>
                 
