@@ -84,8 +84,8 @@
 
                         <d:DataGrid.ItemsSource>
                             <x:Array Type="{x:Type entities:Subscription}">
-                                <entities:Subscription  Type="Kensei_Dojo_Annual_Association" StartDate="2021/09/01"></entities:Subscription>
-                                <entities:Subscription  Type="CIK_Annual_Association" StartDate="2021/09/01" ></entities:Subscription>
+                                <entities:Subscription  Description="Kensei_Dojo_Annual_Association" StartDate="2021/09/01"></entities:Subscription>
+                                <entities:Subscription  Description="CIK_Annual_Association" StartDate="2021/09/01" ></entities:Subscription>
                             </x:Array>
                         </d:DataGrid.ItemsSource>
                         
@@ -115,7 +115,7 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                             <DataGridTextColumn Header="Id" Binding="{Binding Debit.Id}"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Tipo" Binding="{Binding Type }"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Descrizione" Binding="{Binding Description }"></DataGridTextColumn>
                             <DataGridTemplateColumn Header="Inizio" >
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -165,7 +165,7 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="Tipo" Binding="{Binding  Type }"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Associazione" Binding="{Binding Association}"></DataGridTextColumn>
                             <DataGridTextColumn Header="Codice" Binding="{Binding CardId }"></DataGridTextColumn>
                             <DataGridTemplateColumn Header="Inizio">
                                 <DataGridTemplateColumn.CellTemplate>

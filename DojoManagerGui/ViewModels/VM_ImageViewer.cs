@@ -16,7 +16,7 @@ namespace DojoManagerGui.ViewModels
         public event PropertyChangedEventHandler? PropertyChanged;
         public string? ImageFilePath { get; set; }
         public RelayCommand SelectImageCommand { get; }
-        public string ImagesDirectory { get; } 
+        public string ImagesDirectory { get; }
         public VM_ImageViewer(string imageName)
         {
             var assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -25,7 +25,7 @@ namespace DojoManagerGui.ViewModels
             {
                 ImageFilePath = Path.Combine(ImagesDirectory, imageName);
             }
-          
+
             SelectImageCommand = new RelayCommand(SelectImage);
         }
 

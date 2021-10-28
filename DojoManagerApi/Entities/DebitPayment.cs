@@ -6,10 +6,10 @@
     [WrapMe]
     public class DebitPayment : MoneyMovement
     {
-        public virtual Debit Debit { get; set; }   
+        public virtual Debit Debit { get; set; }
         public DebitPayment()
         {
             Direction = MoneyMovementDirection.In;
-        } 
+        }
     }
 }

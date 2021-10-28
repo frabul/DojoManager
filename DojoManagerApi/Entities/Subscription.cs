@@ -2,12 +2,7 @@
 
 namespace DojoManagerApi.Entities
 {
-    public enum SubscriptionType
-    {
-        Generic = 1,
-        Kensei_Dojo_Annual_Association = 1,
-        CIK_Annual_Association,
-    }
+
 
     [WrapMe]
     public class Subscription
@@ -15,7 +10,7 @@ namespace DojoManagerApi.Entities
         public virtual int Id { get; set; }
         public virtual Person Person { get; set; }
         public virtual Debit Debit { get; set; }
-        public virtual SubscriptionType Type { get; set; }
+        public virtual string Description { get; set; }
         public virtual string Notes { get; set; }
         public virtual DateTime StartDate { get; set; }
         public virtual DateTime EndDate { get; set; }
@@ -25,7 +20,7 @@ namespace DojoManagerApi.Entities
 
         public virtual string PrintData()
         {
-            return $"Subscription #{Id}, Type:{Type}, Date:{StartDate}, Notes: {Notes}, Debit: {Debit.ToString()}";
+            return $"Subscription #{Id}, Desc.:{Description}, Date:{StartDate}, Notes: {Notes}, Debit: {Debit.ToString()}";
         }
     }
 

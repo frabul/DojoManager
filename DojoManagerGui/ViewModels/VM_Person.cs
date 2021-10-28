@@ -16,11 +16,11 @@ namespace DojoManagerGui.ViewModels
     {
         public VM_Person(Person person)
         {
-           
+
             Person = (Person)EntityWrapper.Wrap(person);
             var hash = Person.GetHashCode();
-            AddNewCard = new RelayCommand(() => Person.AddCard(new Card()));
-            RemoveCard = new RelayCommand<Card>(c => Person.RemoveCard(c));
+            AddNewCard = new RelayCommand(() => Person.AddCard(new MembershipCard()));
+            RemoveCard = new RelayCommand<MembershipCard>(c => Person.RemoveCard(c));
             AddNewCertificate = new RelayCommand(() => Person.AddCertificate(new Certificate()));
             RemoveCertificate = new RelayCommand<Certificate>(c => Person.RemoveCertificate(c));
             ShowCertificateImage = new RelayCommand<Certificate>(ShowImage);
@@ -69,7 +69,11 @@ namespace DojoManagerGui.ViewModels
         public Person Person { get; }
         public decimal Debit => Person.Subscriptions.Select(s => s.Debit).Sum(d => d.Amount - d.Payments.Sum(pay => pay.Amount));
         public DateTime? CertiFicateExpiration => Person.Certificates.OrderByDescending(c => c.Expiry).FirstOrDefault()?.Expiry;
-        public DateTime? DojoSubscription => Person.Subscriptions.Where(s => s.Type == SubscriptionType.Kensei_Dojo_Annual_Association).OrderByDescending(c => c.StartDate).FirstOrDefault()?.StartDate;
+        public DateTime? DojoSubscription => Person.Cards
+            .Where(s => s.Association.Equals(App.ClubName, StringComparison.InvariantCultureIgnoreCase))
+            .OrderByDescending(c => c.ValidityStartDate)
+            .FirstOrDefault()
+            ?.ValidityStartDate;
 
         public IEnumerable<DebitPayment> Payments => Person.Subscriptions.SelectMany(s => s.Debit.Payments).ToList();
         public IList<Subscription> Subscriptions => Person.Subscriptions;
@@ -80,7 +84,7 @@ namespace DojoManagerGui.ViewModels
         public RelayCommand<Subscription> AddPaymentCommand { get; }
 
         public RelayCommand AddNewCard { get; }
-        public RelayCommand<Card> RemoveCard { get; }
+        public RelayCommand<MembershipCard> RemoveCard { get; }
         public RelayCommand AddNewCertificate { get; }
         public RelayCommand<Certificate> RemoveCertificate { get; }
         public RelayCommand<Certificate> ShowCertificateImage { get; }

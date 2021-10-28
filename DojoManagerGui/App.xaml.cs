@@ -17,6 +17,9 @@ namespace DojoManagerGui
     public partial class App : Application
     {
         public static DojoManagerApi.TestNHibernate Db;
+
+        public static string ClubName { get; set; } = "Ken Sei Dojo";
+
         protected override void OnStartup(StartupEventArgs e)
         {
             Db = new DojoManagerApi.TestNHibernate();
@@ -24,15 +27,15 @@ namespace DojoManagerGui
             Db.Initialize();
             //Db.Populate();
             //Db.Flush(); 
-            
+
             //var decorated = EntitiesViewModelProxy<IDebit>.Create(Db.ListPersons().SelectMany(p => p.Debits).FirstOrDefault() );
             var persons = Db.ListPersons();
-            var proxy = (Person)EntityWrapper.Wrap(persons.First() );
+            var proxy = (Person)EntityWrapper.Wrap(persons.First());
             (proxy as INotifyPropertyChanged).PropertyChanged +=
-                (s, e) => 
+                (s, e) =>
                     Console.WriteLine($"{e} has changed.");
-       
-            Window_Main window = new Window_Main(); 
+
+            Window_Main window = new Window_Main();
             window.Show();
 
         }

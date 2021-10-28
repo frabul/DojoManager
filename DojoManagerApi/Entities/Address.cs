@@ -18,6 +18,6 @@ namespace DojoManagerApi.Entities
         public virtual int Number { get; set; }
         public virtual string PostCode { get; set; }
     }
-    
-  
+
+
 }

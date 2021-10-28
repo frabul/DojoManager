@@ -7,7 +7,7 @@ using System.Text;
 
 namespace DojoManagerApi.Entities
 {
-    
+
 
     [WrapMe]
     public class Person : Subject, IEntityWrapper<Person>
@@ -15,18 +15,18 @@ namespace DojoManagerApi.Entities
         public virtual DateTime BirthDate { get; set; }
         public virtual IList<Certificate> Certificates { get; set; } = new List<Certificate>();
         public virtual IList<Subscription> Subscriptions { get; set; } = new List<Subscription>();
-        public virtual IList<Card> Cards { get; set; } = new List<Card>();
-        [AutomapIgnore ]
+        public virtual IList<MembershipCard> Cards { get; set; } = new List<MembershipCard>();
+        [AutomapIgnore]
         public virtual Person Origin => this;
 
-        public virtual void RemoveCard(Card c)
+        public virtual void RemoveCard(MembershipCard c)
         {
             c.Person = null;
             Cards.Remove(c);
         }
 
         //public virtual IList<Debit> Debits { get; set; } = new List<Debit>();
-        public virtual void AddCard(Card card)
+        public virtual void AddCard(MembershipCard card)
         {
             card.Person = Origin;
             Cards.Add(card);
@@ -39,7 +39,7 @@ namespace DojoManagerApi.Entities
         }
         public virtual void AddSubscription(Subscription subscription, int cost)
         {
-            var deb = new Debit() { Amount = cost  };
+            var deb = new Debit() { Amount = cost };
             subscription.Debit = deb;
             subscription.Person = Origin;
             Subscriptions.Add(subscription);
@@ -54,7 +54,7 @@ namespace DojoManagerApi.Entities
 
         public virtual void RemoveSubscription(Subscription s)
         {
-            
+
             foreach (var p in s.Debit.Payments.ToArray())
             {
                 s.Debit.RemovePayment(p);
@@ -65,7 +65,7 @@ namespace DojoManagerApi.Entities
             Subscriptions.Remove(s);
         }
 
-        
+
         public virtual decimal TotalDue()
         {
             return Subscriptions.Select(s => s.Debit.Amount - s.Debit.Payments.Select(p => p.Amount).Sum()).Sum();

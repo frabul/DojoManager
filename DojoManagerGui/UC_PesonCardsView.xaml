@@ -10,10 +10,10 @@
         <DataGrid ItemsSource="{Binding }" AutoGenerateColumns="False">
 
             <d:DataGrid.ItemsSource>
-                <x:Array Type="{x:Type entities:Card}">
-                    <entities:Card  Type="Kensei" CardId="0x123456789ABC" ValidityStartDate="2019/01/01"> </entities:Card>
-                    <entities:Card  Type="CIK" CardId="0x123456789ABC" ValidityStartDate="2019/01/01"></entities:Card>
-                    <entities:Card  Type="Kensei" CardId="0x123456789ABC" ValidityStartDate="2019/01/01"></entities:Card>
+                <x:Array Type="{x:Type entities:MembershipCard}">
+                    <entities:MembershipCard  Type="Kensei" CardId="0x123456789ABC" ValidityStartDate="2019/01/01"> </entities:MembershipCard>
+                    <entities:MembershipCard  Type="CIK" CardId="0x123456789ABC" ValidityStartDate="2019/01/01"></entities:MembershipCard>
+                    <entities:MembershipCard  Type="Kensei" CardId="0x123456789ABC" ValidityStartDate="2019/01/01"></entities:MembershipCard>
                 </x:Array>
             </d:DataGrid.ItemsSource>
             
