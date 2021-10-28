@@ -133,7 +133,7 @@ namespace DojoManagerApi
             p1.AddCertificate(new Certificate { Expiry = DateTime.Now.AddMonths(7), IsCompetitive = true });
             p1.AddSubscription(new Subscription() { StartDate = Date(2021, 10), EndDate = Date(2022, 08), Type = SubscriptionType.Kensei_Dojo_Annual_Association, Notes = "Sec iscrizione" }, 360);
             p1.AddSubscription(new Subscription() { StartDate = Date(2020, 01), EndDate = Date(2021, 01), Type = SubscriptionType.CIK_Annual_Association, Notes = "Prima iscrizione" }, 25);
-            p1.Subscriptions[0].Debit.AddPayment(360, DateTime.Now, p1.Origin);
+            p1.Subscriptions[0].Debit.AddPayment(360, p1.Subscriptions[0].StartDate.AddDays(1), p1.Origin);
             p1.AddCard(new Card() { CardId = "1111", Type = CardType.Kensei, Invalidated = true });
             var p2 = new Person
             {
@@ -148,7 +148,7 @@ namespace DojoManagerApi
             p2.AddSubscription(new Subscription() { StartDate = Date(2020, 10), EndDate = Date(2021, 08), Type = SubscriptionType.Kensei_Dojo_Annual_Association, Notes = "Prima iscrizione" }, 400);
             p2.AddSubscription(new Subscription() { StartDate = Date(2021, 09), EndDate = Date(2022, 08), Type = SubscriptionType.Kensei_Dojo_Annual_Association, Notes = "Sec iscrizione" }, 360);
             p2.AddSubscription(new Subscription() { StartDate = Date(2021, 01), EndDate = Date(2022, 01), Type = SubscriptionType.CIK_Annual_Association, Notes = "CIK" }, 25);
-            p2.Subscriptions[1].Debit.AddPayment(360, DateTime.Now, p2.Origin);
+            p2.Subscriptions[1].Debit.AddPayment(360, p2.Subscriptions[1].StartDate.AddDays(1), p2.Origin);
 
             p2.AddCard(new Card() { CardId = "22222", Type = CardType.CIK, Invalidated = true });
             InitialPersons = new() { p1, p2 };

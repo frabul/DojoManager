@@ -40,13 +40,14 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Soggetto" Binding="{Binding Movement.Counterpart.Name}"></DataGridTextColumn>
-                <DataGridTemplateColumn Header="Data"  >
+                <DataGridTemplateColumn Header="Data" SortMemberPath="Movement.Date" >
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <ContentPresenter Content="{Binding Movement.Date}"/>
+                            <DatePicker Width="100" SelectedDate="{Binding Movement.Date, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" ></DatePicker>
+                            <!--<ContentPresenter Content="{Binding Movement.Date}"/>-->
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                </DataGridTemplateColumn> 
                 <DataGridTextColumn Header="In/Out" Binding="{Binding Movement.Direction}"></DataGridTextColumn>
                 <DataGridTextColumn Header="Somma" Binding="{Binding Movement.Amount}"></DataGridTextColumn>
                 <DataGridTextColumn Header="Note" Width="1*" MinWidth="200" Binding="{Binding Movement.Notes}"></DataGridTextColumn>

@@ -119,7 +119,7 @@
                             <DataGridTemplateColumn Header="Inizio" >
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <ContentPresenter Content="{Binding StartDate}"/>  
+                                        <DatePicker Width="100" SelectedDate="{Binding StartDate, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"   ></DatePicker>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -127,12 +127,11 @@
                             <DataGridTemplateColumn Header="Fine"  >
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <ContentPresenter Content="{Binding EndDate}"/>
+                                        <DatePicker Width="100" SelectedDate="{Binding EndDate, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" ></DatePicker>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="Costo" Binding="{Binding Debit.Amount }"></DataGridTextColumn>
-
+                            <DataGridTextColumn Header="Costo" Binding="{Binding Debit.Amount }"></DataGridTextColumn> 
                             <DataGridTextColumn Header="Note" Width="1*" MinWidth="200" Binding="{Binding Notes}">
 
                             </DataGridTextColumn>
@@ -171,14 +170,14 @@
                             <DataGridTemplateColumn Header="Inizio">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <ContentPresenter Content="{Binding ValidityStartDate}"/>
+                                        <DatePicker Width="100" SelectedDate="{Binding ValidityStartDate, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" ></DatePicker>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                             <DataGridTemplateColumn Header="Fine"  >
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <ContentPresenter Content="{Binding ExpirationDate}"/>
+                                        <DatePicker Width="100" SelectedDate="{Binding ExpirationDate, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" ></DatePicker>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -221,7 +220,7 @@
                             <DataGridTemplateColumn Header="Scadenza" >
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <ContentPresenter Content="{Binding Expiry}"/>
+                                        <DatePicker Width="100" SelectedDate="{Binding Expiry, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" ></DatePicker> 
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -274,7 +273,7 @@
                             <DataGridTemplateColumn Header="Data" >
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <ContentPresenter Content="{Binding Date}"/>
+                                        <DatePicker Width="100" SelectedDate="{Binding Date, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" ></DatePicker>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>

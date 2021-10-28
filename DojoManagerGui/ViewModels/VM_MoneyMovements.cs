@@ -13,6 +13,7 @@ namespace DojoManagerGui.ViewModels
     public class VM_MoneyMovement
     {
         public MoneyMovement Movement { get; set; }
+        public DateTime Date { get; set; }
         public VM_MoneyMovement(MoneyMovement movement)
         {
             Movement = (MoneyMovement)EntityWrapper.Wrap(movement);
@@ -30,7 +31,11 @@ namespace DojoManagerGui.ViewModels
         {
             Movements = new List<VM_MoneyMovement>();
             UpdateMovements();
-            RemoveMovement = new RelayCommand<VM_MoneyMovement>(m => { });
+            RemoveMovement = new RelayCommand<VM_MoneyMovement>(
+                m =>
+                {
+                }
+            );
         }
 
         public void UpdateMovements()
