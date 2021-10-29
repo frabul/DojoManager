@@ -9,7 +9,7 @@ namespace DojoManagerGui.ViewModels
     public class VM_ListPersons : VM_FunctionPage, INotifyPropertyChanged
     {
         public override string Name => "Persone";
-        public ObservableCollection<VM_Person> Persons { get; set; }
+        public ObservableCollection<VM_Person> People { get; set; }
         public VM_Person? PersonSelected { get; set; }
         public RelayCommand AddNewPersonCommand { get; }
         public RelayCommand SearchCommand { get; }
@@ -17,8 +17,8 @@ namespace DojoManagerGui.ViewModels
         public string NameFilterString { get; set; }
         public VM_ListPersons()
         {
-            RefreshPersons();
-            PersonSelected = Persons?.FirstOrDefault();
+            RefreshPeople();
+            PersonSelected = People?.FirstOrDefault();
             AddNewPersonCommand = new RelayCommand(AddNewPerson);
             SearchCommand = new RelayCommand(SearchPerson);
             RemovePersonCommand = new RelayCommand<VM_Person>(RemovePerson);
@@ -31,11 +31,11 @@ namespace DojoManagerGui.ViewModels
                 int pidSelected = -1;
                 if (PersonSelected != null)
                     pidSelected = PersonSelected.Person.Id;
-                var pvms = App.Db.ListPersons()
+                var pvms = App.Db.ListPeople()
                     .Where(p => p.Name?.Contains(NameFilterString, System.StringComparison.InvariantCultureIgnoreCase) == true)
                     .Select(p => new VM_Person(p));
-                Persons = new ObservableCollection<VM_Person>(pvms);
-                PersonSelected = Persons.FirstOrDefault(p => p.Person.Id == pidSelected);
+                People = new ObservableCollection<VM_Person>(pvms);
+                PersonSelected = People.FirstOrDefault(p => p.Person.Id == pidSelected);
             }
         }
         public void RemovePerson(VM_Person? vm)
@@ -45,9 +45,10 @@ namespace DojoManagerGui.ViewModels
                 int pidSelected = -1;
                 if (PersonSelected != null)
                     pidSelected = PersonSelected.Person.Id;
-                App.Db.Delete(vm.Person );
-                RefreshPersons();
-                PersonSelected = Persons.FirstOrDefault(p => p.Person.Id == pidSelected);
+                App.Db.Delete(vm.Person);
+                People.Remove(vm);
+
+                PersonSelected = People.FirstOrDefault(p => p.Person.Id == pidSelected);
             }
         }
 
@@ -57,16 +58,16 @@ namespace DojoManagerGui.ViewModels
             int pidSelected = -1;
             if (PersonSelected != null)
                 pidSelected = PersonSelected.Person.Id;
-            RefreshPersons();
-            PersonSelected = Persons.FirstOrDefault(p => p.Person.Id == pidSelected);
-
+            People.Add(new VM_Person(person));
+            PersonSelected = People.FirstOrDefault(p => p.Person.Id == pidSelected);
         }
-        private void RefreshPersons()
+
+        private void RefreshPeople()
         {
-            var pvms = App.Db.ListPersons()
+            var pvms = App.Db.ListPeople()
                             .Select(p => p)
                             .Select(p => new VM_Person(p));
-            Persons = new ObservableCollection<VM_Person>(pvms);
+            People = new ObservableCollection<VM_Person>(pvms);
         }
 
 

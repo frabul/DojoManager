@@ -15,6 +15,7 @@ namespace DojoManagerApi
         public string DbRoot { get; }
         public string ImagesDir { get; }
         public string BackupsDir { get; }
+        public bool IsOpen => CurrentSession != null;
 
         private ISessionFactory SessionFactory;
         private ISession CurrentSession;
@@ -113,12 +114,24 @@ namespace DojoManagerApi
 
         public void SetImage(Certificate certificate, string filePath)
         {
-
+            string imageFileName = Path.GetFileName(filePath);
+            string imageFileDir = Path.GetDirectoryName(filePath);
+            //assure that file is in images directory
+            if (Path.Equals(imageFileDir, ImagesDir))
+            {
+                string extension = Path.GetExtension(filePath);
+                var n = certificate.Person.Name.Replace(' ', '_');
+                var destFileName = $"Certificate_{n}_{certificate.Id}.{extension}";
+                var finalImagePath = Path.Combine(ImagesDir, destFileName);
+                File.Copy(filePath, finalImagePath, true);
+                imageFileName = Path.GetFileName(finalImagePath);
+            }
+            certificate.ImageFileName = imageFileName;
         }
 
-        public void GetImagePath(Certificate certificate)
+        public string GetImagePath(Certificate certificate)
         {
-
+            return Path.Combine(ImagesDir, certificate.ImageFileName);
         }
 
         public void AddEntities(IEnumerable<object> entities)
@@ -137,7 +150,7 @@ namespace DojoManagerApi
             });
         }
 
-        public List<Person> ListPersons(string nameFilter = null)
+        public List<Person> ListPeople(string nameFilter = null)
         {
             return ExecuteWithSession(() =>
             {

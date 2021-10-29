@@ -4,13 +4,17 @@
                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                  xmlns:ViewModels="clr-namespace:DojoManagerGui.ViewModels" 
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"  
+                 xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
                  xmlns:local="clr-namespace:DojoManagerGui"
                  Title="DojoManager"
                  Height="800"
                  Width="1400"
                  >
+    <Window.InputBindings>
+        <KeyBinding Modifiers="Control" Key="S" />
+    </Window.InputBindings>
     <mah:MetroWindow.Resources>
-        <ViewModels:VM_MainWindow x:Key="vm"/>
+         
         <Style x:Key="VerticalHeader" TargetType="{x:Type TextBlock}">
             <Setter Property="Foreground"  Value="{DynamicResource MahApps.Brushes.Badged.Foreground}"></Setter>
             <Setter Property="Background"  Value="{DynamicResource MahApps.Brushes.Accent}"></Setter>
@@ -18,7 +22,21 @@
             <Setter Property="TextAlignment"   Value="Center"></Setter>
         </Style>
     </mah:MetroWindow.Resources>
-    <Grid DataContext="{StaticResource vm}">
+    <mah:MetroWindow.LeftWindowCommands>
+        <mah:WindowCommands>
+            <StackPanel Orientation="Horizontal">
+                <Button ToolTip="Save">
+                    <iconPacks:PackIconModern Kind="Save" /> 
+                </Button> 
+            </StackPanel>
+           
+            <Button ToolTip="Save">
+                <iconPacks:PackIconModern Kind="Disk" />
+            </Button>
+        </mah:WindowCommands>
+    </mah:MetroWindow.LeftWindowCommands>
+
+    <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" ></ColumnDefinition>
             <ColumnDefinition Width="Auto"></ColumnDefinition>
@@ -27,6 +45,7 @@
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="*" ></RowDefinition>
         </Grid.RowDefinitions>
+         
         <Border  Margin="1" BorderThickness="1" BorderBrush="{DynamicResource MahApps.Brushes.Accent}"  >
             <Grid Name="GridMenu"  Height="Auto">
                 <Grid.ColumnDefinitions>

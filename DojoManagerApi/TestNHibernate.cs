@@ -106,7 +106,7 @@ namespace DojoManagerApi
             //reinitialize
             db.Close();
             db.Load();
-            var persons = db.ListPersons();
+            var persons = db.ListPeople();
             CompareToInitialSet(persons);
 
 
@@ -121,7 +121,7 @@ namespace DojoManagerApi
             db.Close();
             db.Load();
 
-            var persons = db.ListPersons();//.Select(p => EntityWrapper.Wrap(p) as Person).ToArray();
+            var persons = db.ListPeople();//.Select(p => EntityWrapper.Wrap(p) as Person).ToArray();
             Mod1(persons[0]);
             Mod1(InitialPersons[0]);
 
@@ -129,9 +129,9 @@ namespace DojoManagerApi
             db.Close();
             db.Load();
 
-            var newPersons = db.ListPersons();
-            CompareToInitialSet(db.ListPersons());
-            CompareToInitialSet(db.ListPersons().Select(p => EntityWrapper.Wrap(p) as Person).ToList());
+            var newPersons = db.ListPeople();
+            CompareToInitialSet(db.ListPeople());
+            CompareToInitialSet(db.ListPeople().Select(p => EntityWrapper.Wrap(p) as Person).ToList());
         }
         [TestMethod]
         public void Test3()
@@ -140,7 +140,7 @@ namespace DojoManagerApi
             db.Close();
 
             db.Load();
-            var persons = db.ListPersons().Select(p => EntityWrapper.Wrap(p) as Person).ToArray();
+            var persons = db.ListPeople().Select(p => EntityWrapper.Wrap(p) as Person).ToArray();
             Mod1(persons[0]);
             Mod1(InitialPersons[0]);
             db.Save();
@@ -148,8 +148,8 @@ namespace DojoManagerApi
 
             db.Load();
 
-            CompareToInitialSet(db.ListPersons());
-            CompareToInitialSet(db.ListPersons().Select(p => EntityWrapper.Wrap(p) as Person).ToList());
+            CompareToInitialSet(db.ListPeople());
+            CompareToInitialSet(db.ListPeople().Select(p => EntityWrapper.Wrap(p) as Person).ToList());
         }
 
         [TestMethod]
@@ -159,7 +159,7 @@ namespace DojoManagerApi
             db.Close();
 
             db.Load();
-            var person = db.ListPersons().First();
+            var person = db.ListPeople().First();
             var personId = person.Id;
             var certRemoved = person.Certificates.First();
             var cardRemoved = person.Cards.First();
@@ -243,7 +243,7 @@ namespace DojoManagerApi
 
         public void PrintPersons()
         {
-            var persons = db.ListPersons();
+            var persons = db.ListPeople();
             foreach (var pers in persons)
                 Console.WriteLine(pers.PrintData());
         }

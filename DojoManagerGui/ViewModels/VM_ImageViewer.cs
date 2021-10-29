@@ -1,4 +1,5 @@
-﻿using Microsoft.Toolkit.Mvvm.Input;
+﻿using DojoManagerApi.Entities;
+using Microsoft.Toolkit.Mvvm.Input;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -17,15 +18,10 @@ namespace DojoManagerGui.ViewModels
         public string? ImageFilePath { get; set; }
         public RelayCommand SelectImageCommand { get; }
         public string ImagesDirectory { get; }
-        public VM_ImageViewer(string imageName)
+        public Certificate Certificate { get; } 
+        public VM_ImageViewer(Certificate certificate )
         {
-            var assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            ImagesDirectory = Path.Combine(assemblyDir, "CertificatesImages");
-            if (imageName != null)
-            {
-                ImageFilePath = Path.Combine(ImagesDirectory, imageName);
-            }
-
+            ImageFilePath = App.Db.GetImagePath(certificate); 
             SelectImageCommand = new RelayCommand(SelectImage);
         }
 
@@ -38,15 +34,8 @@ namespace DojoManagerGui.ViewModels
             openFileDialog.InitialDirectory = ImagesDirectory;
             if (openFileDialog.ShowDialog() == true)
             {
-                var selectedFile = openFileDialog.FileName;
-                var selectedFileName = Path.GetFileName(selectedFile);
-                var selectedFileDir = Path.GetDirectoryName(selectedFile);
-                if (selectedFileDir != ImagesDirectory)
-                {
-                    Directory.CreateDirectory(ImagesDirectory);
-                    File.Copy(selectedFile, Path.Combine(ImagesDirectory, selectedFileName));
-                }
-                this.ImageFilePath = Path.Combine(ImagesDirectory, selectedFileName);
+                var selectedFile = openFileDialog.FileName; 
+                App.Db.SetImage(Certificate, selectedFile); 
             }
         }
     }

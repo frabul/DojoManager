@@ -9,7 +9,7 @@ namespace DojoManagerApi.Entities
         public virtual Person Person { get; set; }
         public virtual DateTime Expiry { get; set; }
         public virtual bool IsCompetitive { get; set; }
-        public virtual string ImagePath { get; set; }
+        public virtual string ImageFileName { get; set; }
         public virtual string Notes { get; set; }
 
         public virtual string PrintData()

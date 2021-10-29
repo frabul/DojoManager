@@ -8,12 +8,8 @@
         Title="ImageViewer" Height="600" Width="450"
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:ViewModels="clr-namespace:DojoManagerGui.ViewModels" d:DataContext="{d:DesignInstance Type=ViewModels:VM_ImageViewer}">
-    <StackPanel>
-        <DockPanel>
-            <Label>Path:</Label>
-            <TextBlock ></TextBlock>
-            <Button Command="{Binding SelectImageCommand}">Load</Button>
-        </DockPanel>
-        <Image Source="{Binding  ImageFilePath}"></Image>
+    <StackPanel> 
+        <Button Command="{Binding SelectImageCommand}">Imposta</Button> 
+        <Image Source="{Binding ImageFilePath}"></Image>
     </StackPanel>
 </mah:MetroWindow>

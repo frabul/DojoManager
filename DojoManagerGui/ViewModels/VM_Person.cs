@@ -94,11 +94,11 @@ namespace DojoManagerGui.ViewModels
 
 
         public void ShowImage(Certificate cert)
-        {
-            var vm = new VM_ImageViewer(cert.ImagePath);
+        { 
+            var vm = new VM_ImageViewer(cert);
             var win = new Window_ImageViewer() { DataContext = vm };
             win.ShowDialog();
-            cert.ImagePath = vm.ImageFilePath;
+            cert.ImageFileName = vm.ImageFilePath;
         }
     }
 }
