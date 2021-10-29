@@ -17,73 +17,36 @@ using System.Threading.Tasks;
 
 namespace DojoManagerApi
 {
-    public class SqlStatementInterceptor : EmptyInterceptor
-    {
-        public override NHibernate.SqlCommand.SqlString OnPrepareStatement(NHibernate.SqlCommand.SqlString sql)
-        {
-            //Console.WriteLine();
-            //Console.WriteLine(sql.ToString());
-            return sql;
-        }
 
-    }
 
     [TestClass()]
+
     public class TestNHibernate
     {
+
         string[] SubscriptionTypes = new string[] { "Ken Sei Dojo - iscrizione annuale", "CIK - iscrizione annuale" };
         string[] Associations = new string[] { "Ken Sei Dojo", "CIK" };
         public const string DbFile = "KenseiDojoDb.db";
 
-        public void RemovePerson(Person person)
+        public static void PopulateDb(DbManager db)
         {
-
-            CurrentSession.Delete((person as IEntityWrapper<Person>).Origin);
-            try
-            {
-                CurrentSession.Flush();
-            }
-            catch (Exception ex)
-            {
-
-            }
+            var tester = new TestNHibernate();
+            db.AddEntities(tester.InitialCashMovements.Select(m => EntityWrapper.Wrap(m)));
+            db.AddEntities(tester.InitialPersons);
 
         }
 
         public TestContext TestContext { get; set; }
-
-        public ISessionFactory SessionFactory { get; private set; }
-        public ISession CurrentSession { get; private set; }
-
         private DateTime Date(int year, int month) => new DateTime(year, month, 01);
         List<Person> InitialPersons;
         List<MoneyMovement> InitialCashMovements;
-
+        DbManager db;
         public TestNHibernate()
         {
+
             CreateInitialData();
         }
-        public void Initialize()
-        {
-            Close();
-            SessionFactory = null;
-            var cfg = new NhibernateAutomappingConfig();
-            var autoMaps =
-                AutoMap.AssemblyOf<TestNHibernate>(cfg)
-                        .Conventions.Add(DefaultCascade.SaveUpdate())
-                        .UseOverridesFromAssemblyOf<TestNHibernate>();
 
-            SessionFactory = Fluently.Configure()
-                            .Database(SQLiteConfiguration.Standard.UsingFile(DbFile))
-                            .Mappings(m =>
-                                     m.AutoMappings.Add(autoMaps)
-                                    .ExportTo(@".\")
-                                    )
-                            .ExposeConfiguration(ConfigHandler)
-                            .BuildSessionFactory();
-
-            CurrentSession = SessionFactory.OpenSession();
-        }
         private void CreateInitialData()
         {
             var p1 = new Person
@@ -123,41 +86,6 @@ namespace DojoManagerApi
             };
         }
 
-
-
-        private static void ConfigHandler(Configuration config)
-        {
-            // delete the existing db on each run
-            //if (File.Exists(DbFile))
-            //    File.Delete(DbFile);
-
-            // this NHibernate tool takes a configuration (with mapping info in)
-            // and exports a database schema from it
-            if (!File.Exists("KenseiDojoDb.db"))
-            {
-                new SchemaExport(config).Create(true, true);
-            }
-            else
-            {
-                new SchemaUpdate(config).Execute(true, true);
-            }
-            config.SetInterceptor(new SqlStatementInterceptor());
-        }
-
-        public void Close()
-        {
-            CurrentSession?.Dispose();
-            SessionFactory?.Dispose();
-            CurrentSession = null;
-            SessionFactory = null;
-        }
-
-        public void DeleteDb()
-        {
-            if (File.Exists(DbFile))
-                File.Delete(DbFile);
-        }
-
         void Mod1(Person p)
         {
             p.Name = "spastico";
@@ -171,76 +99,67 @@ namespace DojoManagerApi
         [TestMethod]
         public void Test1()
         {
-            DeleteDb();
-            Initialize();
             Populate();
             PrintPersons();
-            Flush();
+            db.Save();
 
             //reinitialize
-            Initialize();
-            var persons = ListPersons();
+            db.Close();
+            db.Load();
+            var persons = db.ListPersons();
             CompareToInitialSet(persons);
-            Flush();
-            Initialize();
+
+
         }
         [TestMethod]
         public void Test2()
         {
-            Close();
-            DeleteDb();
-            Initialize();
             Populate();
 
 
 
-            Close();
-            Initialize();
+            db.Close();
+            db.Load();
 
-            var persons = ListPersons();//.Select(p => EntityWrapper.Wrap(p) as Person).ToArray();
+            var persons = db.ListPersons();//.Select(p => EntityWrapper.Wrap(p) as Person).ToArray();
             Mod1(persons[0]);
             Mod1(InitialPersons[0]);
 
-            Flush();
-            Initialize();
+            db.Save();
+            db.Close();
+            db.Load();
 
-            var newPersons = ListPersons();
-            CompareToInitialSet(ListPersons());
-            CompareToInitialSet(ListPersons().Select(p => EntityWrapper.Wrap(p) as Person).ToList());
+            var newPersons = db.ListPersons();
+            CompareToInitialSet(db.ListPersons());
+            CompareToInitialSet(db.ListPersons().Select(p => EntityWrapper.Wrap(p) as Person).ToList());
         }
         [TestMethod]
         public void Test3()
         {
-
-            DeleteDb();
-            Initialize();
             Populate();
-            Close();
+            db.Close();
 
-            Initialize();
-            var persons = ListPersons().Select(p => EntityWrapper.Wrap(p) as Person).ToArray();
+            db.Load();
+            var persons = db.ListPersons().Select(p => EntityWrapper.Wrap(p) as Person).ToArray();
             Mod1(persons[0]);
             Mod1(InitialPersons[0]);
-            Flush();
-            Close();
+            db.Save();
+            db.Close();
 
-            Initialize();
+            db.Load();
 
-            CompareToInitialSet(ListPersons());
-            CompareToInitialSet(ListPersons().Select(p => EntityWrapper.Wrap(p) as Person).ToList());
+            CompareToInitialSet(db.ListPersons());
+            CompareToInitialSet(db.ListPersons().Select(p => EntityWrapper.Wrap(p) as Person).ToList());
         }
 
         [TestMethod]
         public void Test_Deletions()
         {
-
-            DeleteDb();
-            Initialize();
             Populate();
-            Close();
+            db.Close();
 
-            Initialize();
-            var person = CurrentSession.Query<Person>().First();
+            db.Load();
+            var person = db.ListPersons().First();
             var personId = person.Id;
             var certRemoved = person.Certificates.First();
             var cardRemoved = person.Cards.First();
@@ -250,15 +169,15 @@ namespace DojoManagerApi
             person.RemoveCard(cardRemoved);
             person.RemoveCertificate(certRemoved);
             person.RemoveSubscription(subRemoved);
-            Flush();
-            Close();
+            db.Save();
+            db.Close();
 
-            Initialize();
-            var person2 = CurrentSession.Get<Person>(person.Id);
-            var cert2 = CurrentSession.Get<Certificate>(certRemoved.Id);
-            var card2 = CurrentSession.Get<MembershipCard>(cardRemoved.Id);
-            var sub2 = CurrentSession.Get<Subscription>(subRemoved.Id);
-            var deb2 = CurrentSession.Get<Debit>(debRemoved);
+            db.Load();
+            var person2 = db.GetEntity<Person>(person.Id);
+            var cert2 = db.GetEntity<Certificate>(certRemoved.Id);
+            var card2 = db.GetEntity<MembershipCard>(cardRemoved.Id);
+            var sub2 = db.GetEntity<Subscription>(subRemoved.Id);
+            var deb2 = db.GetEntity<Debit>(debRemoved);
             Assert.IsNotNull(person2);
             Assert.IsNull(cert2);
             Assert.IsNull(card2);
@@ -266,9 +185,24 @@ namespace DojoManagerApi
             Assert.IsNull(deb2);
             foreach (var pay in payments)
             {
-                Assert.IsNotNull(CurrentSession.Get<DebitPayment>(pay.Id));
+                Assert.IsNotNull(db.GetEntity<DebitPayment>(pay.Id));
             }
 
+        }
+        [TestCleanup]
+        public void CloseAndClear()
+        {
+            db.Close();
+            db.ClearDatabase();
+        }
+
+        [TestInitialize]
+        public void LoadBlankDb()
+        {
+            var docsDir = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments);
+            db = new DbManager("TestDb", docsDir);
+            db.ClearDatabase();
+            db.Load();
         }
 
         private void CompareToInitialSet(List<Person> persons)
@@ -301,48 +235,17 @@ namespace DojoManagerApi
             }
         }
 
-        public List<Person> ListPersons()
-        {
-            var persons = CurrentSession.Query<Person>().ToList();
-            return persons;
-        }
-
         public void Populate()
         {
             CreateInitialData();
-            using var transact = CurrentSession.BeginTransaction();
-
-            foreach (var p in InitialPersons)
-                CurrentSession.Save(p);
-
-            foreach (var cf in InitialCashMovements)
-                CurrentSession.Save(cf);
-            transact.Commit();
+            db.AddEntities(InitialPersons.Cast<object>().Concat(InitialCashMovements));
         }
 
         public void PrintPersons()
         {
-            var persons = CurrentSession.Query<Person>().ToList();
+            var persons = db.ListPersons();
             foreach (var pers in persons)
                 Console.WriteLine(pers.PrintData());
         }
-
-        public void Flush()
-        {
-            CurrentSession.Flush();
-        }
-
-        public Person AddNewPerson()
-        {
-            var p = new Person() { Name = "Jonhn Doe" };
-            CurrentSession.Save(p);
-            return p;
-        }
-
-        public List<MoneyMovement> GetMoneyMovements()
-        {
-            return CurrentSession.Query<MoneyMovement>().ToList();
-        }
     }
-
 }

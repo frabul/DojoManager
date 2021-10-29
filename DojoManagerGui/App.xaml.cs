@@ -16,19 +16,18 @@ namespace DojoManagerGui
     /// </summary>
     public partial class App : Application
     {
-        public static DojoManagerApi.TestNHibernate Db;
+        public static DojoManagerApi.DbManager Db;
 
         public static string ClubName { get; set; } = "Ken Sei Dojo";
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            Db = new DojoManagerApi.TestNHibernate();
-            //Db.DeleteDb();
-            Db.Initialize();
-            //Db.Populate();
-            //Db.Flush(); 
+            Db = new DojoManagerApi.DbManager(Config.Instance.DbName, Config.Instance.DbLocation);
+            Db.ClearDatabase();
+            Db.Load();
+            TestNHibernate.PopulateDb(Db);
+            Db.Save();
 
-            //var decorated = EntitiesViewModelProxy<IDebit>.Create(Db.ListPersons().SelectMany(p => p.Debits).FirstOrDefault() );
             var persons = Db.ListPersons();
             var proxy = (Person)EntityWrapper.Wrap(persons.First());
             (proxy as INotifyPropertyChanged).PropertyChanged +=

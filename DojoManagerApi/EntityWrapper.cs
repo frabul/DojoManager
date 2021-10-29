@@ -16,7 +16,8 @@ using System.Collections;
 
 namespace DojoManagerApi
 {
-    public interface IEntityWrapper<T>
+
+    public interface IEntityWrapper<out T>
     {
         T Origin { get; }
     }

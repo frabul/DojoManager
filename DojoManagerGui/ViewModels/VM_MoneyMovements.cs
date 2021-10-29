@@ -40,7 +40,7 @@ namespace DojoManagerGui.ViewModels
 
         public void UpdateMovements()
         {
-            var movements = App.Db.GetMoneyMovements();
+            var movements = App.Db.ListMovements(DateTime.MinValue, DateTime.MaxValue);
             Movements = new List<VM_MoneyMovement>(movements.Select(m => new VM_MoneyMovement(m)));
         }
 

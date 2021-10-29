@@ -45,7 +45,7 @@ namespace DojoManagerGui.ViewModels
                 int pidSelected = -1;
                 if (PersonSelected != null)
                     pidSelected = PersonSelected.Person.Id;
-                App.Db.RemovePerson(vm.Person.Origin);
+                App.Db.Delete(vm.Person );
                 RefreshPersons();
                 PersonSelected = Persons.FirstOrDefault(p => p.Person.Id == pidSelected);
             }
@@ -53,7 +53,7 @@ namespace DojoManagerGui.ViewModels
 
         public void AddNewPerson()
         {
-            var person = App.Db.AddNewPerson();
+            var person = App.Db.AddNewPerson("John Doe");
             int pidSelected = -1;
             if (PersonSelected != null)
                 pidSelected = PersonSelected.Person.Id;

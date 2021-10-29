@@ -18,22 +18,23 @@ namespace DojoManagerGui
         {
             get
             {
-                if (instance == null) 
-                    instance = Load(); 
+                if (instance == null)
+                    instance = Load();
                 return instance;
-            }  
+            }
             private set => instance = value;
         }
 
 
         public string NomeAssociazione { get; set; } = "Ken Sei Dojo";
+        public string DbName => NomeAssociazione.Replace(' ', '_');
         public string[] SuggerimentiAssociazioni { get; set; }
         public string[] SuggerimentiSottoscrizioni { get; set; }
-        public string DataBaseFilePath { get; set; }
+        public string DbLocation { get; set; }
 
         public Config()
         {
-            DataBaseFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "KenSeiDojo_Manager.db");
+            DbLocation = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             SuggerimentiAssociazioni = new string[] { NomeAssociazione, "CIK" };
             SuggerimentiSottoscrizioni = new string[] { "Ken Sei Dojo - iscrizione annuale", "CIK - iscrizione annuale" };
         }

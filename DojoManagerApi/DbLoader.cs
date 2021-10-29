@@ -4,6 +4,7 @@ using FluentNHibernate.Cfg.Db;
 using FluentNHibernate.Conventions.Helpers;
 using NHibernate;
 using NHibernate.Cfg;
+using NHibernate.Tool.hbm2ddl;
 using System.IO;
 
 namespace DojoManagerApi
@@ -31,21 +32,15 @@ namespace DojoManagerApi
         }
         private static void ConfigHandler(Configuration config)
         {
-            // delete the existing db on each run
-            //if (File.Exists(DbFile))
-            //    File.Delete(DbFile);
-
-            // this NHibernate tool takes a configuration (with mapping info in)
-            // and exports a database schema from it
             if (!File.Exists("KenseiDojoDb.db"))
             {
-                new SchemaExport(config).Create(true, true);
+                new SchemaExport(config).Create(false, true);
             }
             else
             {
                 new SchemaUpdate(config).Execute(true, true);
             }
-            config.SetInterceptor(new SqlStatementInterceptor());
+            config.SetInterceptor(new NHibernateInterceptor());
         }
 
     }
