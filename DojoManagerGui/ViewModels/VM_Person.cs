@@ -130,6 +130,11 @@ namespace DojoManagerGui.ViewModels
 
             SetPersonPictureCommand = new RelayCommand(() => SetPersonPicture());
 
+            IsMember = Person.Cards.Where(c=>
+                c.Association == Config.Instance.NomeAssociazione
+                && !c.Invalidated
+                && DateTime.Now < c.ExpirationDate && DateTime.Now >= c.ValidityStartDate ).Any();
+
             DispatcherTimer dispatcherTimer = new DispatcherTimer();
 
             dispatcherTimer.Interval = TimeSpan.FromSeconds(0.3);
@@ -142,7 +147,7 @@ namespace DojoManagerGui.ViewModels
         }
 
 
-
+        public bool IsMember { get; private set; }
         public virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

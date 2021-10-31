@@ -225,9 +225,11 @@ namespace DojoManagerApi
         }
         public MoneyMovement AddNewMovement( Subject subject)
         {
+            var sb = subject;
             if (subject is IEntityWrapper<Subject> entityWrapper)
                 subject = entityWrapper.Origin;
-            var mov = new MoneyMovement() {  Counterpart = subject };
+            var mov = new MoneyMovement() {  Counterpart = subject, Date = DateTime.Now };
+            sb.Movements.Add(mov);
             CurrentSession.Save(mov);
             return mov;
         }
@@ -260,11 +262,12 @@ namespace DojoManagerApi
             {
                 var persons = CurrentSession
                     .Query<MoneyMovement>()
-                    .Where(e => e.Date >= startTime && e.Date <= endTime && e.Counterpart.Id == subjectId)
+                    .Where(e => e.Date >= startTime && e.Date <= endTime && e.Counterpart.Id == subjectId) 
                     .ToList();
                 return persons;
             });
         }
+
         public List<MoneyMovement> ListMovements(DateTime startTime, DateTime endTime)
         {
             return ExecuteWithSession(() =>

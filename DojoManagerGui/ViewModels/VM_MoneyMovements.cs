@@ -24,6 +24,9 @@ namespace DojoManagerGui.ViewModels
     }
     public class VM_MoneyMovements : VM_FunctionPage, INotifyPropertyChanged
     {
+        private DateTime? _StartDateFilter;
+        private DateTime? _EndDateFilter;
+
         public Subject SubjectAssociated { get; }
         public ObservableCollection<MoneyMovement> Movements { get; set; }
         public override string Name => "Entrate/Uscite";
@@ -31,36 +34,50 @@ namespace DojoManagerGui.ViewModels
 
         public RelayCommand<MoneyMovement> RemoveMovementCommand { get; }
         public RelayCommand AddNewMovementCommand { get; }
-
+        public RelayCommand SearchCommand { get; }
+        public DateTime? StartDateFilter { get => _StartDateFilter; set { _StartDateFilter = value; Refresh(); } }
+        public DateTime? EndDateFilter { get => _EndDateFilter; set { _EndDateFilter = value; Refresh(); } }
+        public string SubjectNameFilter { get; set; }
+        public bool IsFiltersBoxVisible { get; set; }
+        public bool IsAddAddButtonVisible { get; set; }
         public VM_MoneyMovements(Subject subjectAssociated)
         {
             SubjectAssociated = subjectAssociated;
             Movements = new ObservableCollection<MoneyMovement>();
             Refresh();
-            RemoveMovementCommand = new RelayCommand<MoneyMovement>(RemoveMovementF);
+            RemoveMovementCommand = new RelayCommand<MoneyMovement>(RemoveMovementFAsync);
             AddNewMovementCommand = new RelayCommand(AddNewMovement);
+            SearchCommand = new RelayCommand(Refresh);
             WeakReferenceMessenger.Default.Register<EntityListChangedMessage<MoneyMovement>>(this,
                 (r, a) =>
                 {
                     var rec = (VM_MoneyMovements)r;
-                    if(rec != a.Sender) 
-                        this.Refresh(); 
+                    if (rec != a.Sender)
+                        this.Refresh();
                 });
+            IsFiltersBoxVisible = subjectAssociated == null;
+            IsAddAddButtonVisible = subjectAssociated != null;
         }
+
 
 
 
         public void Refresh()
         {
+            var startDate = StartDateFilter ?? DateTime.MinValue;
+            var endData = EndDateFilter ?? DateTime.MaxValue;
+
             IEnumerable<MoneyMovement> movements = Enumerable.Empty<MoneyMovement>();
             if (SubjectAssociated != null)
             {
-                movements = App.Db.ListMovements(DateTime.MinValue, DateTime.MaxValue, SubjectAssociated.Id);
+                movements = App.Db.ListMovements(startDate, endData, SubjectAssociated.Id);
             }
             else
             {
-                movements = App.Db.ListMovements(DateTime.MinValue, DateTime.MaxValue);
-
+                movements = App.Db.ListMovements(startDate, endData);
+                if (!string.IsNullOrWhiteSpace(SubjectNameFilter))
+                    movements = movements.Where(m =>
+                        m.Counterpart.Name.Contains(SubjectNameFilter, StringComparison.InvariantCultureIgnoreCase));
             }
             Movements = new ObservableCollection<MoneyMovement>(
                     movements.Select(m => (MoneyMovement)EntityWrapper.Wrap(m)));
@@ -77,23 +94,27 @@ namespace DojoManagerGui.ViewModels
                    new EntityListChangedMessage<MoneyMovement>(this, new MoneyMovement[] { mov }, Array.Empty<MoneyMovement>()));
             }
         }
-        private void RemoveMovementF(MoneyMovement? obj)
+        private async void RemoveMovementFAsync(MoneyMovement? obj)
         {
             if (obj != null)
             {
                 if (obj is DebitPayment p)
                 {
-                    App.ShowMessage("Attenzione!",
+                    await App.ShowMessage("Attenzione!",
                         "Non è possibile rimuovere questo movimento da questa schermata poichè ha un debito associato." + Environment.NewLine +
-                        $"Prova a rimuoverlo dalla lista pagamenti della persona ({p.Notes}).");
+                        $"Prova a rimuoverlo dalla lista pagamenti della persona ({p.Counterpart.Name}).");
                 }
                 else
                 {
-                    App.Db.Delete(obj);
-                    App.Db.Save();
-                    this.Movements.Remove(obj);
-                    WeakReferenceMessenger.Default.Send(
-                        new EntityListChangedMessage<MoneyMovement>(this, Array.Empty<MoneyMovement>(), new MoneyMovement[] { obj }));
+                    await App.AskAndExecuteAsync(() =>
+                    {
+                        App.Db.Delete(obj);
+                        App.Db.Save();
+                        this.Movements.Remove(obj);
+                        WeakReferenceMessenger.Default.Send(
+                            new EntityListChangedMessage<MoneyMovement>(this, Array.Empty<MoneyMovement>(), new MoneyMovement[] { obj }));
+                    });
+
                 }
             }
         }

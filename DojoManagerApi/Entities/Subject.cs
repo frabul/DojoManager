@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace DojoManagerApi.Entities
@@ -12,5 +13,7 @@ namespace DojoManagerApi.Entities
         public virtual Address Address { get; set; }
         public virtual string PhoneNumber { get; set; }
         public virtual string Notes { get; set; }
+
+        public virtual IList<MoneyMovement> Movements { get; set; } = new List<MoneyMovement>();
     }
 }

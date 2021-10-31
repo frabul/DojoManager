@@ -12,6 +12,8 @@ namespace DojoManagerGui.ViewModels
     public class VM_ListPersons : VM_FunctionPage, INotifyPropertyChanged
     {
         private int? LastPersonSelectedId;
+        private bool showMembers = true;
+        private bool showNonMembers = true;
 
         public override string Name => "Persone";
         public ObservableCollection<VM_Person> People { get; set; }
@@ -69,7 +71,8 @@ namespace DojoManagerGui.ViewModels
                         new EntityListChangedMessage<Subject>(this, new Subject[] { person }, new Subject[] { }));
             PopPersonSelected();
         }
-
+        public bool ShowMembers { get => showMembers; set { showMembers = value; RefreshPeople(); } }
+        public bool ShowNonMembers { get => showNonMembers; set { showNonMembers = value; RefreshPeople(); } }
         private void RefreshPeople()
         {
             PushPersonSelected();
@@ -77,8 +80,9 @@ namespace DojoManagerGui.ViewModels
             IEnumerable<Person> ppl = App.Db.ListPeople();
             if (!string.IsNullOrWhiteSpace(NameFilterString))
                 ppl = ppl.Where(p => p.Name.Contains(NameFilterString, StringComparison.InvariantCultureIgnoreCase));
-            People = new ObservableCollection<VM_Person>(ppl.Select(p => new VM_Person(p)));
+            var p2 = ppl.Select(p => new VM_Person(p)).Where(p => (p.IsMember && ShowMembers) || (!p.IsMember && ShowNonMembers));
 
+            People = new ObservableCollection<VM_Person>(p2);
             PopPersonSelected();
 
         }

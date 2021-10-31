@@ -97,6 +97,7 @@
         
             
         </Border>
+        
         <ContentControl Content="{Binding FunctionSelected}"
                         Margin="1,0,1,1"
                         Grid.Row="1">
@@ -104,7 +105,7 @@
                 <!--Template for VM_ListPersons-->
                 <DataTemplate DataType="{x:Type ViewModels:VM_ListPersons}">
                     <DockPanel  >
-                        <GroupBox Header="Persone">
+                        <GroupBox Header="Lista">
                             <local:UC_ListPersons></local:UC_ListPersons>
                         </GroupBox>
                         <GroupBox 

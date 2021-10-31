@@ -13,6 +13,10 @@ using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Win32;
 
+using System.Diagnostics;
+using Gehtsoft.PDFFlow.Builder;
+using Gehtsoft.PDFFlow.Models.Shared;
+
 namespace DojoManagerGui
 {
     /// <summary>
@@ -28,6 +32,9 @@ namespace DojoManagerGui
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            PdfTest.Test();
+   
+
             Db = new DojoManagerApi.DbManager(Config.Instance.DbName, Config.Instance.DbLocation);
             //Db.ClearDatabase();
             Db.Load();

@@ -11,71 +11,108 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" 
              x:Name="root">
-    <Grid  >
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+    <Grid >
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="25"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition  Height="*"/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
-        <DataGrid ItemsSource="{Binding Movements}" AutoGenerateColumns="False"  CanUserAddRows="False" CanUserDeleteRows="False">
-            <DataGrid.RowStyle>
-                <Style TargetType="{x:Type DataGridRow}">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding Direction}" Value="Out">
-                            <Setter  Property="Background" Value="#ff8566"></Setter>
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding Direction}" Value="In">
-                            <Setter  Property="Background" Value="#FF49ae49"></Setter>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </DataGrid.RowStyle>
-            <DataGrid.Columns>
-                <DataGridTemplateColumn>
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <!---->
-                            <Button Height="23" Width="23" Padding="2"  
+        <Grid.InputBindings>
+            <KeyBinding Key="Return" Command="{Binding SearchCommand, Mode=OneWay}" />
+        </Grid.InputBindings>
+        <GroupBox Header="Filtri" Style="{x:Null}" Visibility="{Binding IsFiltersBoxVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <WrapPanel> 
+                <DatePicker  
+                    SelectedDate="{Binding StartDateFilter, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                    Margin="2"
+                    mah:TextBoxHelper.Watermark="Data iniziale"
+                    mah:TextBoxHelper.UseFloatingWatermark="True"
+                ></DatePicker>
+                <DatePicker  
+                    SelectedDate="{Binding EndDateFilter, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                    Margin="2"
+                    mah:TextBoxHelper.Watermark="Data finale"
+                    mah:TextBoxHelper.UseFloatingWatermark="True"
+                ></DatePicker>
+                <TextBox
+                    Text="{Binding SubjectNameFilter, UpdateSourceTrigger=PropertyChanged}"
+                    Margin="2"
+                    mah:TextBoxHelper.Watermark="Nome ( o parte ) soggetto"
+                    mah:TextBoxHelper.UseFloatingWatermark="True"
+                    ></TextBox>
+            </WrapPanel>
+        </GroupBox>
+
+        <Grid x:Name="GridData" Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="25"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <DataGrid  Grid.Row="0"
+                        ItemsSource="{Binding Movements}" AutoGenerateColumns="False"  CanUserAddRows="False" CanUserDeleteRows="False">
+                <DataGrid.RowStyle>
+                    <Style TargetType="{x:Type DataGridRow}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Direction}" Value="Out">
+                                <Setter  Property="Background" Value="#ff8566"></Setter>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Direction}" Value="In">
+                                <Setter  Property="Background" Value="#FF49ae49"></Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.RowStyle>
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <!---->
+                                <Button Height="23" Width="23" Padding="2"  
                                     Command="{Binding Path=DataContext.RemoveMovementCommand, ElementName=root}"
                                     CommandParameter="{Binding .}" 
                                      >
-                                <Path Stretch="Uniform" Fill="Black" 
+                                    <Path Stretch="Uniform" Fill="Black" 
                                     Data="M20,6H16V5a3,3,0,0,0-3-3H11A3,3,0,0,0,8,5V6H4A1,1,0,0,0,4,8H5V19a3,3,0,0,0,3,3h8a3,3,0,0,0,3-3V8h1a1,1,0,0,0,0-2ZM10,5a1,1,0,0,1,1-1h2a1,1,0,0,1,1,1V6H10Zm7,14a1,1,0,0,1-1,1H8a1,1,0,0,1-1-1V8H17Z">
-                                </Path>
-                            </Button>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTextColumn Header="Soggetto" Binding="{Binding Counterpart.Name}" IsReadOnly="True"></DataGridTextColumn>
-                <DataGridTemplateColumn Header="Data" SortMemberPath="Date" >
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <DatePicker Background="Transparent" Width="100" SelectedDate="{Binding Date, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" ></DatePicker>
-                            <!--<ContentPresenter Content="{Binding Movement.Date}"/>-->
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <!--<DataGridTextColumn Header="In/Out" Binding="{Binding Movement.Direction}"></DataGridTextColumn>-->
-                <DataGridTemplateColumn Header="In/Out"  >
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <ComboBox Background="Transparent"
+                                    </Path>
+                                </Button>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Soggetto" Binding="{Binding Counterpart.Name}" IsReadOnly="True"></DataGridTextColumn>
+                    <DataGridTemplateColumn Header="Data" SortMemberPath="Date" >
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <DatePicker Background="Transparent" Width="100" SelectedDate="{Binding Date, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" ></DatePicker>
+                                <!--<ContentPresenter Content="{Binding Movement.Date}"/>-->
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <!--<DataGridTextColumn Header="In/Out" Binding="{Binding Movement.Direction}"></DataGridTextColumn>-->
+                    <DataGridTemplateColumn Header="In/Out"  >
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ComboBox Background="Transparent"
                                       ItemsSource="{Binding Source={local:Enumeration {x:Type entities:MoneyMovementDirection}}}"
                                       SelectedValue="{Binding Direction, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  
                                       DisplayMemberPath="Description" 
                                       SelectedValuePath="Value" >
-                            </ComboBox>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTextColumn Header="Somma" Binding="{Binding Amount}"></DataGridTextColumn>
-                <DataGridTextColumn Header="Note" Width="1*" MinWidth="200" Binding="{Binding Notes}"></DataGridTextColumn>
+                                </ComboBox>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Somma" Binding="{Binding Amount}"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Note" Width="1*" MinWidth="200" Binding="{Binding Notes}"></DataGridTextColumn>
 
-            </DataGrid.Columns>
-        </DataGrid>
-        <Button Grid.Row="3" Command="{Binding AddNewMovementCommand}"  >Aggiungi</Button>
+                </DataGrid.Columns>
+            </DataGrid>
+            <Button Grid.Row="3" Command="{Binding AddNewMovementCommand}" Visibility="{Binding IsAddAddButtonVisible, Converter={StaticResource BooleanToVisibilityConverter}}"  >Aggiungi</Button>
+        </Grid>
     </Grid>
+
 </UserControl>
