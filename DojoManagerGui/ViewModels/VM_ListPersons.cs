@@ -3,11 +3,16 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
+using Microsoft.Toolkit.Mvvm.Messaging;
+using System.Collections.Generic;
+using System;
 
 namespace DojoManagerGui.ViewModels
 {
     public class VM_ListPersons : VM_FunctionPage, INotifyPropertyChanged
     {
+        private int? LastPersonSelectedId;
+
         public override string Name => "Persone";
         public ObservableCollection<VM_Person> People { get; set; }
         public VM_Person? PersonSelected { get; set; }
@@ -15,6 +20,7 @@ namespace DojoManagerGui.ViewModels
         public RelayCommand SearchCommand { get; }
         public RelayCommand<VM_Person> RemovePersonCommand { get; }
         public string NameFilterString { get; set; }
+
         public VM_ListPersons()
         {
             RefreshPeople();
@@ -22,54 +28,69 @@ namespace DojoManagerGui.ViewModels
             AddNewPersonCommand = new RelayCommand(AddNewPerson);
             SearchCommand = new RelayCommand(SearchPerson);
             RemovePersonCommand = new RelayCommand<VM_Person>(RemovePerson);
+            WeakReferenceMessenger.Default.Register<EntityListChangedMessage<Subject>>(this,
+                (r, a) =>
+                {
+                    VM_ListPersons rec = (VM_ListPersons)r;
+                    if (rec != a.Sender)
+                        rec.RefreshPeople();
+                });
         }
 
         public void SearchPerson()
         {
-            if (NameFilterString != null)
-            {
-                int pidSelected = -1;
-                if (PersonSelected != null)
-                    pidSelected = PersonSelected.Person.Id;
-                var pvms = App.Db.ListPeople()
-                    .Where(p => p.Name?.Contains(NameFilterString, System.StringComparison.InvariantCultureIgnoreCase) == true)
-                    .Select(p => new VM_Person(p));
-                People = new ObservableCollection<VM_Person>(pvms);
-                PersonSelected = People.FirstOrDefault(p => p.Person.Id == pidSelected);
-            }
+            RefreshPeople();
         }
-        public void RemovePerson(VM_Person? vm)
+        public async void RemovePerson(VM_Person? vm)
         {
             if (vm != null)
             {
-                int pidSelected = -1;
-                if (PersonSelected != null)
-                    pidSelected = PersonSelected.Person.Id;
-                App.Db.Delete(vm.Person);
-                People.Remove(vm);
-
-                PersonSelected = People.FirstOrDefault(p => p.Person.Id == pidSelected);
+                await App.AskAndExecuteAsync(() =>
+                {
+                    PushPersonSelected();
+                    App.Db.Delete(vm.Person);
+                    App.Db.Save();
+                    People.Remove(vm);
+                    WeakReferenceMessenger.Default.Send<EntityListChangedMessage<Subject>>(
+                        new EntityListChangedMessage<Subject>(this, new Subject[0] { }, new[] { vm.Person }));
+                    PopPersonSelected();
+                });
             }
         }
 
         public void AddNewPerson()
         {
+
+            PushPersonSelected();
             var person = App.Db.AddNewPerson("John Doe");
-            int pidSelected = -1;
-            if (PersonSelected != null)
-                pidSelected = PersonSelected.Person.Id;
             People.Add(new VM_Person(person));
-            PersonSelected = People.FirstOrDefault(p => p.Person.Id == pidSelected);
+            App.Db.Save();
+            WeakReferenceMessenger.Default.Send<EntityListChangedMessage<Subject>>(
+                        new EntityListChangedMessage<Subject>(this, new Subject[] { person }, new Subject[] { }));
+            PopPersonSelected();
         }
 
         private void RefreshPeople()
         {
-            var pvms = App.Db.ListPeople()
-                            .Select(p => p)
-                            .Select(p => new VM_Person(p));
-            People = new ObservableCollection<VM_Person>(pvms);
+            PushPersonSelected();
+
+            IEnumerable<Person> ppl = App.Db.ListPeople();
+            if (!string.IsNullOrWhiteSpace(NameFilterString))
+                ppl = ppl.Where(p => p.Name.Contains(NameFilterString, StringComparison.InvariantCultureIgnoreCase));
+            People = new ObservableCollection<VM_Person>(ppl.Select(p => new VM_Person(p)));
+
+            PopPersonSelected();
+
         }
 
+        private void PopPersonSelected()
+        {
+            PersonSelected = People.FirstOrDefault(p => p.Person.Id == LastPersonSelectedId);
+        }
 
+        private void PushPersonSelected()
+        {
+            LastPersonSelectedId = PersonSelected?.Person.Id;
+        }
     }
 }

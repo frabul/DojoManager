@@ -23,7 +23,7 @@ namespace DojoManagerGui.ViewModels
             {
                 new VM_ListPersons(),
                 new VM_Subjects(),
-                new VM_MoneyMovements()
+                new VM_MoneyMovements(null)
             };
             FunctionSelected = FunctionPages[0];
         }

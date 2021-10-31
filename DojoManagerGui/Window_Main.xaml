@@ -115,6 +115,12 @@
                     </DockPanel> 
                 </DataTemplate>
                 <!--Template for VM_ListPersons-->
+                <DataTemplate DataType="{x:Type ViewModels:VM_Subjects}">
+                    <GroupBox Header="Soggetti">
+                        <local:UC_Subjects></local:UC_Subjects>
+                    </GroupBox>
+                </DataTemplate> 
+            <!--Template for VM_ListPersons-->
                 <DataTemplate DataType="{x:Type ViewModels:VM_MoneyMovements}"> 
                     <GroupBox Header="Entrate/Uscite">
                         <local:UC_MoneyMovements></local:UC_MoneyMovements>

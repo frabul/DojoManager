@@ -1,9 +1,14 @@
 ﻿using DojoManagerApi.Entities;
 using NHibernate;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -68,6 +73,12 @@ namespace DojoManagerApi
             });
         }
 
+        public List<T> ListEntities<T>(Func<IQueryable<T>, IQueryable<T>> query)
+        {
+            var q = query.Invoke(CurrentSession.Query<T>());
+            return q.ToList();
+        }
+
         private void CreateBackUp()
         {
             //TODO
@@ -106,18 +117,52 @@ namespace DojoManagerApi
                 return p;
             });
         }
-
+        public Subject AddNewSubject(string name)
+        {
+            return ExecuteWithSession(() =>
+            {
+                var p = new Subject() { Name = name };
+                CurrentSession.Save(p);
+                return p;
+            });
+        }
         public void RemoveSubscription()
         {
 
         }
+        public void SetImage(Person person, string imgPath)
+        {
+            var img = Image.Load(imgPath);
+            SetImage(person, img);
+        }
+        public void SetImage(Person person, Image img)
+        {
+            var destFileName = $"Person_Picture_{person.Id}.png";
+            var maxHeight = 400;
+            var maxWidth = 300;
+            var heightRatio = (float)img.Height / maxHeight;
+            var widthRatio = (float)img.Width / maxWidth;
+            if (heightRatio > 1 || widthRatio > 1)
+            {
+                var reduction = 1f;
+                if (heightRatio > widthRatio)
+                    reduction = 1f / heightRatio;
+                else
+                    reduction = 1f / widthRatio;
+                img.Mutate(x => x.Resize((int)(reduction * img.Width), (int)(reduction * img.Height)));
 
+            }
+            if (File.Exists(destFileName))
+                File.Delete(destFileName);
+            img.Save(Path.Combine(ImagesDir, destFileName));
+            person.PictureFileName = destFileName;
+        }
         public void SetImage(Certificate certificate, string filePath)
         {
             string imageFileName = Path.GetFileName(filePath);
             string imageFileDir = Path.GetDirectoryName(filePath);
             //assure that file is in images directory
-            if (Path.Equals(imageFileDir, ImagesDir))
+            if (!Path.Equals(imageFileDir, ImagesDir))
             {
                 string extension = Path.GetExtension(filePath);
                 var n = certificate.Person.Name.Replace(' ', '_');
@@ -131,8 +176,37 @@ namespace DojoManagerApi
 
         public string GetImagePath(Certificate certificate)
         {
-            return Path.Combine(ImagesDir, certificate.ImageFileName);
+            if ( !string.IsNullOrEmpty(certificate.ImageFileName))
+                return Path.Combine(ImagesDir, certificate.ImageFileName);
+            else
+                return null;
         }
+
+        public byte[] GetImageBytes(Person person)
+        {
+            if (!string.IsNullOrEmpty(person.PictureFileName))
+            {
+
+
+                var img = Image.Load<Rgba32>(Path.Combine(ImagesDir, person.PictureFileName));
+                //var ok = img.TryGetSinglePixelSpan(out Span<Rgba32> span );
+                //if (ok)
+                //{
+                //    byte[] rgbaBytes = MemoryMarshal.AsBytes(span ).ToArray();
+                //    return rgbaBytes;
+                //}
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    img.SaveAsPng(ms);
+                    var buffer = new byte[ms.Length];
+                    ms.Seek(0, SeekOrigin.Begin);
+                    ms.Read(buffer, 0, buffer.Length);
+                    return buffer;
+                }
+            }
+            return new byte[0];
+        }
+
 
         public void AddEntities(IEnumerable<object> entities)
         {
@@ -149,6 +223,24 @@ namespace DojoManagerApi
                 transact.Commit();
             });
         }
+        public MoneyMovement AddNewMovement( Subject subject)
+        {
+            if (subject is IEntityWrapper<Subject> entityWrapper)
+                subject = entityWrapper.Origin;
+            var mov = new MoneyMovement() {  Counterpart = subject };
+            CurrentSession.Save(mov);
+            return mov;
+        }
+        public List<Subject> ListSubjects(string nameFilter = null)
+        {
+            return ExecuteWithSession(() =>
+            {
+                var q = CurrentSession.Query<Subject>();
+                if (nameFilter != null)
+                    q = q.Where(p => p.Name.Contains(nameFilter));
+                return q.ToList();
+            });
+        }
 
         public List<Person> ListPeople(string nameFilter = null)
         {
@@ -161,6 +253,18 @@ namespace DojoManagerApi
             });
         }
 
+
+        public List<MoneyMovement> ListMovements(DateTime startTime, DateTime endTime, int subjectId)
+        {
+            return ExecuteWithSession(() =>
+            {
+                var persons = CurrentSession
+                    .Query<MoneyMovement>()
+                    .Where(e => e.Date >= startTime && e.Date <= endTime && e.Counterpart.Id == subjectId)
+                    .ToList();
+                return persons;
+            });
+        }
         public List<MoneyMovement> ListMovements(DateTime startTime, DateTime endTime)
         {
             return ExecuteWithSession(() =>

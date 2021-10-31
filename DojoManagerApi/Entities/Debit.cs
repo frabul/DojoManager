@@ -17,7 +17,7 @@ namespace DojoManagerApi.Entities
         {
             Payments = new List<DebitPayment>();
         }
-        public virtual void AddPayment(decimal amount, DateTime date, Subject payer)
+        public virtual DebitPayment AddPayment(decimal amount, DateTime date, Subject payer)
         {
             var payment = new DebitPayment()
             {
@@ -28,6 +28,7 @@ namespace DojoManagerApi.Entities
                 Notes = ""
             };
             this.Payments.Add(payment);
+            return payment;
         }
         public virtual void RemovePayment(DebitPayment debitPayment)
         {

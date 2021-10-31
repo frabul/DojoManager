@@ -12,7 +12,7 @@ namespace DojoManagerApi
             mapping.HasMany(p => p.Certificates).Cascade.AllDeleteOrphan().Inverse();
             mapping.HasMany(p => p.Subscriptions).Cascade.AllDeleteOrphan().Inverse();
             mapping.HasMany(p => p.Cards).Cascade.AllDeleteOrphan().Inverse();
+            mapping.HasMany(p => p.Examinations).Cascade.AllDeleteOrphan().Inverse();
         }
-    }
-
+    } 
 }

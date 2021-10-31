@@ -37,7 +37,7 @@
                 </TextBox.Style>
             </TextBox>
         </DockPanel>
-        <DataGrid Grid.Row="1" ItemsSource="{Binding Persons}" SelectedItem="{Binding PersonSelected}" AutoGenerateColumns="False">
+        <DataGrid Grid.Row="1" ItemsSource="{Binding People}" SelectedItem="{Binding PersonSelected}" AutoGenerateColumns="False">
             <DataGrid.Columns>
                 <DataGridTemplateColumn Header="" >
                     <DataGridTemplateColumn.CellTemplate>

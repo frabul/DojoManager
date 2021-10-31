@@ -8,6 +8,7 @@
              xmlns:entities="clr-namespace:DojoManagerApi.Entities;assembly=DojoManagerApi"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:viewmodels="clr-namespace:DojoManagerGui.ViewModels" 
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              d:DataContext="{d:DesignInstance Type=viewmodels:VM_Person}"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800"
@@ -16,63 +17,116 @@
 
     <UserControl.Resources>
         <Style TargetType="{x:Type TextBox}">
-            <Setter Property="Margin" Value="3" />
+            <Setter Property="Padding" Value="3" />
         </Style>
-        
+
     </UserControl.Resources>
-    <ScrollViewer  
-            MinWidth="230" 
+    <ScrollViewer   
             HorizontalContentAlignment="Stretch"
             HorizontalScrollBarVisibility="Disabled"
             VerticalScrollBarVisibility="Visible">
         <StackPanel>
-            <Grid>
+            <Grid Margin="3">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="180"></ColumnDefinition>
                     <ColumnDefinition></ColumnDefinition>
                     <ColumnDefinition></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition></RowDefinition>
-                    <RowDefinition></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                   
                 </Grid.RowDefinitions>
                 <Grid.Resources>
-                    <Style TargetType="{x:Type Label}">
-                        <Setter Property="MinWidth" Value="100"></Setter>
-                    </Style>
-                </Grid.Resources>
 
-                <StackPanel Grid.Column="0" Orientation="Vertical">
-                    <DockPanel>
-                        <Label Margin="3">Nome:</Label>
-                        <TextBox Margin="3" Text="{Binding Person.Name}"></TextBox>
-                    </DockPanel>
-                    <DockPanel>
-                        <Label Margin="3">Data di nascita:</Label>
-                        <TextBox Margin="3" Text="{Binding Person.BirthDate, StringFormat=dd/MM/yyyy}"></TextBox>
-                    </DockPanel>
-                </StackPanel>
+                </Grid.Resources>
+                <!--Picture-->
+                <Border VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                        Grid.Row="0" Grid.RowSpan="2" 
+                        BorderThickness="1" BorderBrush="{StaticResource MahApps.Brushes.Accent}">
+                    <!--<Image Source="{Binding PersonPicture}" Stretch="Uniform" ></Image>-->
+                    <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                        <Image   Source="{Binding PersonPicture}"  Stretch="Uniform" ></Image>
+                        <Button HorizontalAlignment="Right" VerticalAlignment="Bottom" 
+                                Command="{Binding SetPersonPictureCommand}"
+                                Margin="3">
+                            <iconPacks:PackIconModern Kind="FolderOpen" />
+                        </Button>
+                    </Grid>
+                </Border>
 
                 <StackPanel Grid.Column="1" Orientation="Vertical">
+                    <StackPanel.Resources>
+                        <Style TargetType="{x:Type Label}">
+                            <Setter Property="MinWidth" Value="90"></Setter>
+                        </Style>
+                    </StackPanel.Resources>
                     <DockPanel>
-                        <Label Margin="3">Email:</Label>
-                        <TextBox Margin="3" Text="{Binding Person.EMail}"></TextBox>
+                        <Label >Nome:</Label>
+                        <TextBox Text="{Binding Person.Name}" Padding="3"></TextBox>
                     </DockPanel>
                     <DockPanel>
-                        <Label Margin="3">Tel:</Label>
-                        <TextBox Margin="3" Text="{Binding Person.PhoneNumber}"></TextBox>
+                        <Label >Data di nascita:</Label>
+                        <TextBox  Text="{Binding Person.BirthDate, StringFormat=dd/MM/yyyy}"></TextBox>
                     </DockPanel>
+                    <DockPanel>
+                        <Label >Cod.Fiscale:</Label>
+                        <TextBox  Text="{Binding Person.TaxIdentificationNumber}"></TextBox>
+                    </DockPanel>
+                    <DockPanel>
+                        <Label >Email:</Label>
+                        <TextBox  Text="{Binding Person.EMail}"></TextBox>
+                    </DockPanel>
+                    <DockPanel>
+                        <Label >Tel:</Label>
+                        <TextBox  Text="{Binding Person.PhoneNumber}"></TextBox>
+                    </DockPanel> 
+                </StackPanel> 
+                <!-- INDIRIZZO -->
+                <StackPanel Grid.Column="2"  Orientation="Vertical" > 
+                    <GroupBox Header="Indirizzo" VerticalAlignment="Top" Style="{x:Null}" >
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Top" Height="Auto">
+                            <StackPanel.Resources>
+                                <Style TargetType="{x:Type Label}">
+                                    <Setter Property="MinWidth" Value="70"></Setter>
+                                </Style>
+                            </StackPanel.Resources>
+                            <Grid >
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="4*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                </Grid.ColumnDefinitions>
+                                <DockPanel>
+                                    <Label >Via/Piazza:</Label>
+                                    <TextBox Text="{Binding Person.Address.Street }"></TextBox>
+                                </DockPanel>
+                                <DockPanel Grid.Column="1">
+                                    <Label MinWidth="0" >N.</Label>
+                                    <TextBox Text="{Binding Person.Address.Number}"></TextBox>
+                                </DockPanel>
+                            </Grid>
+                            <DockPanel>
+                                <Label >Località:</Label>
+                                <TextBox  Text="{Binding Person.Address.City}"></TextBox>
+                            </DockPanel>
+                            <DockPanel>
+                                <Label >CAP:</Label>
+                                <TextBox  Text="{Binding Person.Address.PostCode}"></TextBox>
+                            </DockPanel>
+                        </StackPanel>
+                    </GroupBox>
                 </StackPanel>
-                <StackPanel Grid.Row="1" Grid.ColumnSpan="2">
-                    <Label>Note:</Label>
-                    <TextBox Margin="3" MinHeight="40" MaxHeight="80" TextWrapping="Wrap"
-                         Text="{Binding Person.Notes}"
-                         AcceptsReturn="True"
-                         VerticalScrollBarVisibility="Auto">
+                <!-- Note -->
+                <GroupBox Grid.Row="1" Grid.Column="1" Header="Note" VerticalAlignment="Top" Style="{x:Null}" >
+                    <TextBox Margin="3" MinHeight="50" MaxHeight="80" TextWrapping="Wrap"
+                                 Text="{Binding Person.Notes}"
+                                 AcceptsReturn="True"
+                                 VerticalScrollBarVisibility="Auto">
                     </TextBox>
-                </StackPanel>
+                </GroupBox>
             </Grid>
             <!--   SOTTOSCRIZIONI     -->
-            <Expander Header="Sottoscrizioni" IsExpanded="True">
+            <Expander Header="Sottoscrizioni" IsExpanded="False">
                 <!--<local:UC_PersonSubscriptions DataContext="{Binding Subscriptions}"></local:UC_PersonSubscriptions>-->
                 <Grid>
                     <Grid.RowDefinitions>
@@ -88,7 +142,7 @@
                                 <entities:Subscription  Description="CIK_Annual_Association" StartDate="2021/09/01" ></entities:Subscription>
                             </x:Array>
                         </d:DataGrid.ItemsSource>
-                        
+
                         <DataGrid.Columns>
                             <DataGridTemplateColumn Header="" >
                                 <DataGridTemplateColumn.CellTemplate>
@@ -115,7 +169,16 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                             <DataGridTextColumn Header="Id" Binding="{Binding Debit.Id}"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Descrizione" Binding="{Binding Description }"></DataGridTextColumn>
+                            <DataGridTemplateColumn Header="Descrizione"  >
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ComboBox  Text="{Binding Description}" 
+                                                   ItemsSource="{Binding ElementName=root, Path=DataContext.SubscriptionsSuggested}"
+                                                   IsEditable="True"
+                                                   Style="{DynamicResource MahApps.Styles.ComboBox.Virtualized}" ></ComboBox>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                             <DataGridTemplateColumn Header="Inizio" >
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -123,7 +186,7 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <!--Binding="{Binding StartDate, StringFormat=d}"--> 
+                            <!--Binding="{Binding StartDate, StringFormat=d}"-->
                             <DataGridTemplateColumn Header="Fine"  >
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -131,7 +194,7 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="Costo" Binding="{Binding Debit.Amount }"></DataGridTextColumn> 
+                            <DataGridTextColumn Header="Costo" Binding="{Binding Debit.Amount }"></DataGridTextColumn>
                             <DataGridTextColumn Header="Note" Width="1*" MinWidth="200" Binding="{Binding Notes}">
 
                             </DataGridTextColumn>
@@ -141,7 +204,7 @@
                 </Grid>
             </Expander>
             <!--   TESSERE       -->
-            <Expander Header="Tessere" Margin="0,1,0,0" IsExpanded="True">
+            <Expander Header="Tessere" Margin="0,1,0,0" IsExpanded="False">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition></RowDefinition>
@@ -165,7 +228,16 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="Associazione" Binding="{Binding Association}"></DataGridTextColumn>
+                            <DataGridTemplateColumn Header="Associazione"  >
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ComboBox  Text="{Binding Association}" 
+                                                   ItemsSource="{Binding ElementName=root, Path=DataContext.CardsSuggested}"
+                                                   IsEditable="True"
+                                                   Style="{DynamicResource MahApps.Styles.ComboBox.Virtualized}" ></ComboBox>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                             <DataGridTextColumn Header="Codice" Binding="{Binding CardId }"></DataGridTextColumn>
                             <DataGridTemplateColumn Header="Inizio">
                                 <DataGridTemplateColumn.CellTemplate>
@@ -220,14 +292,14 @@
                             <DataGridTemplateColumn Header="Scadenza" >
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <DatePicker Width="100" SelectedDate="{Binding Expiry, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" ></DatePicker> 
+                                        <DatePicker Width="100" SelectedDate="{Binding Expiry, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" ></DatePicker>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                             <DataGridTemplateColumn Header="Immagine">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button Command="{Binding Path=DataContext.ShowCertificateImage, ElementName=root }"
+                                        <Button Command="{Binding Path=DataContext.ShowCertificateImageCommand, ElementName=root }"
                                             CommandParameter="{Binding .}">...</Button>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
@@ -241,7 +313,7 @@
                 </Grid>
             </Expander>
             <!--   PAGAMENTI     -->
-            <Expander Header="Pagamenti" Margin="0,1,0,0" IsExpanded="True">
+            <Expander Header="Pagamenti" Margin="0,1,0,0" IsExpanded="False">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition></RowDefinition>
@@ -281,8 +353,60 @@
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
-            </Expander>
+            </Expander> 
+            <!--ESAMI-->
+            <Expander Header="Esami" Margin="0,1,0,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <DataGrid Name="ExamsDataGrid" ItemsSource="{Binding Person.Examinations}" 
+                          AutoGenerateColumns="False" CanUserAddRows="False"
+                          CanUserDeleteRows="False"  >
 
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Header="" >
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button  Height="25" Width="25" Padding="2" 
+                                             Command="{Binding Path=DataContext.RemoveExaminationCommand, ElementName=root}" 
+                                             CommandParameter="{Binding .}" >
+                                            <Path   Stretch="Fill"  Fill="Black" 
+                                                Data="M20,6H16V5a3,3,0,0,0-3-3H11A3,3,0,0,0,8,5V6H4A1,1,0,0,0,4,8H5V19a3,3,0,0,0,3,3h8a3,3,0,0,0,3-3V8h1a1,1,0,0,0,0-2ZM10,5a1,1,0,0,1,1-1h2a1,1,0,0,1,1,1V6H10Zm7,14a1,1,0,0,1-1,1H8a1,1,0,0,1-1-1V8H17Z">
+                                            </Path>
+                                        </Button>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridCheckBoxColumn Header="Superato" Binding="{Binding Passed}"></DataGridCheckBoxColumn>
+                            <DataGridTemplateColumn Header="Grado" >
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ComboBox ItemsSource="{Binding ElementName=root, Path=DataContext.KendoDegrees}"  
+                                                  SelectedValue="{Binding DegreeAcquired}"
+                                                  SelectedValuePath="Value"
+                                                  DisplayMemberPath="Description"
+                                                  /> 
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn> 
+                            <DataGridTemplateColumn Header="Data">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <DatePicker Width="100" SelectedDate="{Binding Date, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" ></DatePicker>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            
+                            <DataGridTextColumn Header="Note" Width="1*" MinWidth="200" Binding="{Binding Notes}">
+
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Button Grid.Row="1" Height="20" HorizontalAlignment="Stretch" Command="{Binding AddExaminationCommand}">Aggiungi</Button>
+                </Grid>
+            </Expander>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

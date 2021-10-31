@@ -3,10 +3,86 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:DojoManagerGui"
+             xmlns:local="clr-namespace:DojoManagerGui" 
+             xmlns:viewmodels="clr-namespace:DojoManagerGui.ViewModels" 
+             d:DataContext="{d:DesignInstance Type=viewmodels:VM_Subjects}" 
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800"
+             Name="root">
     <Grid>
-            
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="25"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <!--<ColumnDefinition Width="*"></ColumnDefinition>-->
+        </Grid.ColumnDefinitions>
+        <DockPanel>
+            <TextBox Margin="1" Text="{Binding NameFilterString, UpdateSourceTrigger=PropertyChanged}"
+                             mah:TextBoxHelper.ButtonCommand="{Binding SearchCommand, Mode=OneWay}" 
+                             mah:TextBoxHelper.ClearTextButton="True" 
+                             mah:TextBoxHelper.UseFloatingWatermark="True"
+                             mah:TextBoxHelper.Watermark="Cerca per nome..." >
+                <TextBox.InputBindings>
+                    <KeyBinding Key="Return" Command="{Binding SearchCommand, Mode=OneWay}" />
+                </TextBox.InputBindings>
+                <TextBox.Style>
+                    <Style BasedOn="{StaticResource MahApps.Styles.TextBox.Search}" TargetType="{x:Type TextBox}">
+                        <Style.Triggers>
+                            <Trigger Property="mah:TextBoxHelper.HasText" Value="True">
+                                <Setter Property="mah:TextBoxHelper.ButtonContent" Value="r" />
+                                <Setter Property="mah:TextBoxHelper.ButtonContentTemplate" Value="{x:Null}" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBox.Style>
+            </TextBox>
+        </DockPanel>
+        <DataGrid Grid.Row="1" Grid.Column="0"
+                  ItemsSource="{Binding Subjects}" 
+                  SelectedItem="{Binding SubjectSelected}" 
+                  AutoGenerateColumns="False" 
+                  CanUserAddRows="False">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="" >
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button  Height="25" Width="25" Padding="2" 
+                                             Command="{Binding Path=DataContext.RemoveSubjectCommand, ElementName=root}" 
+                                             CommandParameter="{Binding .}" >
+                                <Path Stretch="Uniform" Fill="Black" 
+                                      Data="M20,6H16V5a3,3,0,0,0-3-3H11A3,3,0,0,0,8,5V6H4A1,1,0,0,0,4,8H5V19a3,3,0,0,0,3,3h8a3,3,0,0,0,3-3V8h1a1,1,0,0,0,0-2ZM10,5a1,1,0,0,1,1-1h2a1,1,0,0,1,1,1V6H10Zm7,14a1,1,0,0,1-1,1H8a1,1,0,0,1-1-1V8H17Z">
+                                </Path>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Nome" Binding="{Binding Name}"></DataGridTextColumn>
+                <DataGridTextColumn Header="EMail" Binding="{Binding EMail}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Tel." Binding="{Binding PhoneNumber}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Città" Binding="{Binding Address.City}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Via" Binding="{Binding Address.Street}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Numero" Binding="{Binding Address.Number}"></DataGridTextColumn>
+                <DataGridTextColumn Header="CAP" Binding="{Binding Address.PostCode}"></DataGridTextColumn>
+                <DataGridTextColumn Header="CAP" Binding="{Binding Address.PostCode}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Notes" Binding="{Binding Notes}" Width="*"></DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button Grid.Row="2" Command="{Binding AddNewSubjectCommand}">Aggiungi</Button>
+        <!--asdasdasd-->
+        <Expander Grid.Row="1" Grid.RowSpan="4" 
+                  VerticalAlignment="Bottom" 
+                  Header="{Binding SubjectSelected.Name}" 
+                  HeaderStringFormat="Movimenti soggetto selezionato ({0})" 
+                  IsExpanded="True"> 
+            <local:UC_MoneyMovements DataContext="{Binding MovementsOfSubjectSelected}"  > 
+            </local:UC_MoneyMovements>
+        </Expander>
+
     </Grid>
 </UserControl>

@@ -12,10 +12,14 @@ namespace DojoManagerApi.Entities
     [WrapMe]
     public class Person : Subject, IEntityWrapper<Person>
     {
+        public virtual string TaxIdentificationNumber { get; set; }
         public virtual DateTime BirthDate { get; set; }
+        public virtual string PictureFileName { get; set; }
         public virtual IList<Certificate> Certificates { get; set; } = new List<Certificate>();
         public virtual IList<Subscription> Subscriptions { get; set; } = new List<Subscription>();
         public virtual IList<MembershipCard> Cards { get; set; } = new List<MembershipCard>();
+        public virtual IList<KendoExamination> Examinations { get; set; } = new List<KendoExamination>();
+
         [AutomapIgnore]
         public virtual Person Origin => this;
 
@@ -65,16 +69,11 @@ namespace DojoManagerApi.Entities
             Subscriptions.Remove(s);
         }
 
-
         public virtual decimal TotalDue()
         {
             return Subscriptions.Select(s => s.Debit.Amount - s.Debit.Payments.Select(p => p.Amount).Sum()).Sum();
         }
 
-        public override string ToString()
-        {
-            return $"{{ Id: {Id} - Name: {Name} - CertCnt: {Certificates.Count} }}";
-        }
 
         public virtual string PrintData()
         {
@@ -94,5 +93,31 @@ namespace DojoManagerApi.Entities
                 builder.AppendLine(c.ToString().PadRight(4));
             return builder.ToString();
         }
+
+        public override string ToString()
+        {
+            return $"{{ Id: {Id} - Name: {Name} - CertCnt: {Certificates.Count} }}";
+        }
+
+        public virtual void AddNewExamination()
+        {
+            KendoDegree currentDegree = KendoDegree.Kyu6;
+            var passedExams = Examinations.Where(e => e.Passed);
+            if (passedExams.Any())
+                currentDegree = (KendoDegree)passedExams.Max(e => e.DegreeAcquired);
+            var newEx = new KendoExamination()
+            {
+                DegreeAcquired = currentDegree + 1,
+                Person = this.Origin, 
+            };
+            this.Examinations.Add(newEx);
+        }
+        public virtual void RemoveExamination(KendoExamination e)
+        {
+            e.Person = null;
+            this.Examinations.Remove(e);
+        }
     }
+
+
 }

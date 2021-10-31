@@ -17,26 +17,27 @@ namespace DojoManagerGui.ViewModels
         public event PropertyChangedEventHandler? PropertyChanged;
         public string? ImageFilePath { get; set; }
         public RelayCommand SelectImageCommand { get; }
-        public string ImagesDirectory { get; }
-        public Certificate Certificate { get; } 
-        public VM_ImageViewer(Certificate certificate )
+        public Certificate Certificate { get; }
+        public VM_ImageViewer(Certificate certificate)
         {
-            ImageFilePath = App.Db.GetImagePath(certificate); 
+            Certificate = certificate;
+            ImageFilePath = App.Db.GetImagePath(certificate);
             SelectImageCommand = new RelayCommand(SelectImage);
         }
 
 
         public void SelectImage()
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Multiselect = false;
-            openFileDialog.Filter = "Image files (*.png;*.jpeg;*.bmp) | *.png;*.jpeg;*.bmp";
-            openFileDialog.InitialDirectory = ImagesDirectory;
-            if (openFileDialog.ShowDialog() == true)
+            var selectedFile = App.SelectImage();
+            if (selectedFile != null)
             {
-                var selectedFile = openFileDialog.FileName; 
-                App.Db.SetImage(Certificate, selectedFile); 
+                App.Db.SetImage(Certificate, selectedFile);
+                ImageFilePath = App.Db.GetImagePath(Certificate);
             }
+
+
         }
+
+
     }
 }

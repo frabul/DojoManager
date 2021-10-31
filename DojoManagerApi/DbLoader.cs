@@ -9,6 +9,10 @@ using System.IO;
 
 namespace DojoManagerApi
 {
+    /// <summary>
+    /// Todo refreshare tutti quando si cancella o aggiunge oggetti base
+    /// todo fare aggiunte movimenti
+    /// </summary>
     public static class DbLoader
     {
         public static ISessionFactory Load(string dbFilePath)
