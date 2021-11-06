@@ -13,9 +13,9 @@
     <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="*"></RowDefinition>
-
             <RowDefinition Height="Auto"></RowDefinition>
+
+            <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="1"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
@@ -38,9 +38,10 @@
             </TextBox>
 
         </DockPanel>
-        <Border Grid.Row="1" >
-            <Grid Grid.Row="1" >
-                <DataGrid Margin="0,0,0,30" VerticalAlignment="Top"
+
+        <Button  VerticalAlignment="Bottom" Grid.Row="1"  Command="{Binding AddNewSubjectCommand}">Aggiungi</Button>
+        <DataGrid 
+                  Grid.Row="2" Margin="0,0,0,30" VerticalAlignment="Top"
                   ItemsSource="{Binding Subjects}" 
                   SelectedItem="{Binding SubjectSelected}" 
                   AutoGenerateColumns="False" 
@@ -71,9 +72,9 @@
                         <DataGridTextColumn Header="Notes" Binding="{Binding Notes}" Width="*"></DataGridTextColumn>
                     </DataGrid.Columns>
                 </DataGrid>
-                <Button  VerticalAlignment="Bottom" Grid.Row="1"  Command="{Binding AddNewSubjectCommand}">Aggiungi</Button>
-            </Grid>
-        </Border>
+
+ 
+ 
 
         <!--asdasdasd-->
         <Expander Grid.Row="4" 

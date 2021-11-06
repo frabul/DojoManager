@@ -15,7 +15,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"></RowDefinition>
                 <RowDefinition Height="Auto"></RowDefinition>
-                <RowDefinition Height="25"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
             <GroupBox Style="{x:Null}" Header="Filtri">
                 <StackPanel>
@@ -36,8 +36,8 @@
                     </WrapPanel>
                 </StackPanel>
             </GroupBox>
-
-            <DataGrid Grid.Row="1" ItemsSource="{Binding People}" 
+            <Button Grid.Row="1" Command="{Binding AddNewPersonCommand}">Aggiungi</Button>
+            <DataGrid Grid.Row="2" ItemsSource="{Binding People}" 
                       SelectedItem="{Binding PersonSelected}" 
                       AutoGenerateColumns="False"
                       > 
@@ -61,7 +61,7 @@
                     <DataGridTextColumn IsReadOnly="True" Header="Debiti" Binding="{Binding Debit}"></DataGridTextColumn>
                 </DataGrid.Columns>
             </DataGrid>
-            <Button Grid.Row="2" Command="{Binding AddNewPersonCommand}">Aggiungi</Button>
+            
         </Grid>
     </ScrollViewer>
 

@@ -112,7 +112,7 @@ namespace DojoManagerApi
         {
             return ExecuteWithSession(() =>
             {
-                var p = new Person() { Name = name };
+                var p = new Person() { Name = name, BirthDate = DateTime.Now };
                 CurrentSession.Save(p);
                 return p;
             });

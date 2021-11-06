@@ -67,7 +67,8 @@
                     </DockPanel>
                     <DockPanel>
                         <Label >Data di nascita:</Label>
-                        <TextBox  Text="{Binding Person.BirthDate, StringFormat=dd/MM/yyyy}"></TextBox>
+                        <DatePicker SelectedDate="{Binding Person.BirthDate, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"  ></DatePicker>
+                        <!--<TextBox  Text="{Binding Person.BirthDate, StringFormat=dd/MM/yyyy}"></TextBox>-->
                     </DockPanel>
                     <DockPanel>
                         <Label >Cod.Fiscale:</Label>

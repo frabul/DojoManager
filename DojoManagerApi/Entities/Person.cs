@@ -109,6 +109,7 @@ namespace DojoManagerApi.Entities
             {
                 DegreeAcquired = currentDegree + 1,
                 Person = this.Origin, 
+                Date = DateTime.Now
             };
             this.Examinations.Add(newEx);
         }

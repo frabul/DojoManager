@@ -49,7 +49,14 @@ namespace DojoManagerGui.ViewModels
 
             Person = (Person)EntityWrapper.Wrap(person);
             var hash = Person.GetHashCode();
-            AddNewCard = new RelayCommand(() => Person.AddCard(new MembershipCard()));
+            AddNewCard = new RelayCommand(
+                () => Person.AddCard(
+                           new MembershipCard()
+                           {
+                               ValidityStartDate = DateTime.Now,
+                               ExpirationDate = DateTime.Now
+                           }
+                       ));
             RemoveCard = new RelayCommand<MembershipCard>(async c =>
             {
                 if (c != null)
@@ -58,7 +65,7 @@ namespace DojoManagerGui.ViewModels
                         Person.RemoveCard(c);
                     });
             });
-            AddNewCertificate = new RelayCommand(() => Person.AddCertificate(new Certificate()));
+            AddNewCertificate = new RelayCommand(() => Person.AddCertificate(new Certificate() { Expiry = DateTime.Now }));
             RemoveCertificate = new RelayCommand<Certificate>(async c =>
             {
                 if (c != null)
@@ -70,7 +77,7 @@ namespace DojoManagerGui.ViewModels
             });
             ShowCertificateImageCommand = new RelayCommand<Certificate>(ShowCertificateImage);
             AddSubscriptionCommand = new RelayCommand(
-                    () => Person.AddSubscription(new Subscription(), 0),
+                    () => Person.AddSubscription(new Subscription() { StartDate = DateTime.Now, EndDate = DateTime.Now }, 0),
                     () => Person != null);
 
             RemoveSubscriptionCommand = new RelayCommand<Subscription>(
@@ -130,10 +137,10 @@ namespace DojoManagerGui.ViewModels
 
             SetPersonPictureCommand = new RelayCommand(() => SetPersonPicture());
 
-            IsMember = Person.Cards.Where(c=>
+            IsMember = Person.Cards.Where(c =>
                 c.Association == Config.Instance.NomeAssociazione
                 && !c.Invalidated
-                && DateTime.Now < c.ExpirationDate && DateTime.Now >= c.ValidityStartDate ).Any();
+                && DateTime.Now < c.ExpirationDate && DateTime.Now >= c.ValidityStartDate).Any();
 
             DispatcherTimer dispatcherTimer = new DispatcherTimer();
 
