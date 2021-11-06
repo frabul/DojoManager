@@ -46,7 +46,7 @@ namespace DojoManagerGui.ViewModels
         {
             Subjects = new ObservableCollection<Subject>();
             RefreshSubjects();
-            SubjectSelected = Subjects.First();
+            SubjectSelected = Subjects.FirstOrDefault();
 
             AddNewSubjectCommand = new RelayCommand(() =>
             {

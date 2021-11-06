@@ -32,7 +32,7 @@ namespace DojoManagerGui
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            PdfTest.Test();
+            //PdfTest.Test();
    
 
             Db = new DojoManagerApi.DbManager(Config.Instance.DbName, Config.Instance.DbLocation);

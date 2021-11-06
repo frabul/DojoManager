@@ -1,4 +1,5 @@
-﻿using FluentNHibernate.Automapping;
+﻿using DojoManagerApi.Entities;
+using FluentNHibernate.Automapping;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
 using FluentNHibernate.Conventions.Helpers;
@@ -15,13 +16,16 @@ namespace DojoManagerApi
     /// </summary>
     public static class DbLoader
     {
+        public static string DbFilePath { get; private set; }
+
         public static ISessionFactory Load(string dbFilePath)
         {
+            DbFilePath = dbFilePath;
             var cfg = new NhibernateAutomappingConfig();
             var autoMaps =
-                AutoMap.AssemblyOf<TestNHibernate>(cfg)
+                AutoMap.AssemblyOf<Person>(cfg)
                         .Conventions.Add(DefaultCascade.SaveUpdate())
-                        .UseOverridesFromAssemblyOf<TestNHibernate>();
+                        .UseOverridesFromAssemblyOf<Person>();
 
             var SessionFactory = Fluently.Configure()
                             .Database(SQLiteConfiguration.Standard.UsingFile(dbFilePath))
@@ -36,7 +40,7 @@ namespace DojoManagerApi
         }
         private static void ConfigHandler(Configuration config)
         {
-            if (!File.Exists("KenseiDojoDb.db"))
+            if (!File.Exists(DbFilePath))
             {
                 new SchemaExport(config).Create(false, true);
             }
