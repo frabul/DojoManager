@@ -47,16 +47,23 @@ namespace DojoManagerGui.ViewModels
         {
             if (vm != null)
             {
-                await App.AskAndExecuteAsync(() =>
+                //check that person is not associated with any debit
+                var movements = App.Db.ListMovements(DateTime.MinValue, DateTime.MaxValue, vm.Person.Id);
+                if (movements.Any())
+                    await App.ShowMessage("Errore", "Non è possibile rimuovere questa persona perchè è associata a delle movimenti finanziari.");
+                else
                 {
-                    PushPersonSelected();
-                    App.Db.Delete(vm.Person);
-                    App.Db.Save();
-                    People.Remove(vm);
-                    WeakReferenceMessenger.Default.Send<EntityListChangedMessage<Subject>>(
-                        new EntityListChangedMessage<Subject>(this, new Subject[0] { }, new[] { vm.Person }));
-                    PopPersonSelected();
-                });
+                    await App.AskAndExecuteAsync(() =>
+                    {
+                        PushPersonSelected();
+                        App.Db.Delete(vm.Person);
+                        App.Db.Save();
+                        People.Remove(vm);
+                        WeakReferenceMessenger.Default.Send<EntityListChangedMessage<Subject>>(
+                            new EntityListChangedMessage<Subject>(this, new Subject[0] { }, new[] { vm.Person }));
+                        PopPersonSelected();
+                    });
+                }
             }
         }
 
