@@ -27,7 +27,7 @@ namespace DojoManagerGui
 
 
         public string NomeAssociazione { get; set; } = "Ken Sei Dojo";
-        public string DbName => NomeAssociazione.Replace(' ', '_');
+        public string DbName => NomeAssociazione.Replace(' ', '_') + "_db";
         public string[] SuggerimentiAssociazioni { get; set; }
         public string[] SuggerimentiSottoscrizioni { get; set; }
         public string DbLocation { get; set; }

@@ -14,6 +14,7 @@ namespace DojoManagerApi.Entities
     {
         public virtual string TaxIdentificationNumber { get; set; }
         public virtual DateTime BirthDate { get; set; }
+        public virtual string BirthLocation { get; set; }
         public virtual string PictureFileName { get; set; }
         public virtual IList<Certificate> Certificates { get; set; } = new List<Certificate>();
         public virtual IList<Subscription> Subscriptions { get; set; } = new List<Subscription>();

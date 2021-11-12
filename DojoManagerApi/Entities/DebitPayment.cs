@@ -9,6 +9,9 @@ namespace DojoManagerApi.Entities
     public class DebitPayment : MoneyMovement
     {
         public virtual Debit Debit { get; set; }
+        public virtual string PayerName { get; set; }
+        public virtual string PayerCode { get; set; }
+
         public override MoneyMovementDirection Direction
         {
             get => base.Direction;

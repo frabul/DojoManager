@@ -58,7 +58,7 @@
                 <StackPanel Grid.Column="1" Orientation="Vertical">
                     <StackPanel.Resources>
                         <Style TargetType="{x:Type Label}">
-                            <Setter Property="MinWidth" Value="90"></Setter>
+                            <Setter Property="MinWidth" Value="100"></Setter>
                         </Style>
                     </StackPanel.Resources>
                     <DockPanel>
@@ -71,6 +71,10 @@
                         <!--<TextBox  Text="{Binding Person.BirthDate, StringFormat=dd/MM/yyyy}"></TextBox>-->
                     </DockPanel>
                     <DockPanel>
+                        <Label >Luogo di nascita:</Label>
+                        <TextBox  Text="{Binding Person.BirthLocation}"></TextBox>
+                    </DockPanel>
+                    <DockPanel>
                         <Label >Cod.Fiscale:</Label>
                         <TextBox  Text="{Binding Person.TaxIdentificationNumber}"></TextBox>
                     </DockPanel>
@@ -78,20 +82,18 @@
                         <Label >Email:</Label>
                         <TextBox  Text="{Binding Person.EMail}"></TextBox>
                     </DockPanel>
-                    <DockPanel>
-                        <Label >Tel:</Label>
-                        <TextBox  Text="{Binding Person.PhoneNumber}"></TextBox>
-                    </DockPanel> 
+                    
                 </StackPanel> 
                 <!-- INDIRIZZO -->
-                <StackPanel Grid.Column="2"  Orientation="Vertical" > 
+                <StackPanel Grid.Column="2"  Orientation="Vertical" >
+                    <StackPanel.Resources>
+                        <Style TargetType="{x:Type Label}">
+                            <Setter Property="MinWidth" Value="70"></Setter>
+                        </Style>
+                    </StackPanel.Resources>
                     <GroupBox Header="Indirizzo" VerticalAlignment="Top" Style="{x:Null}" >
                         <StackPanel Orientation="Vertical" VerticalAlignment="Top" Height="Auto">
-                            <StackPanel.Resources>
-                                <Style TargetType="{x:Type Label}">
-                                    <Setter Property="MinWidth" Value="70"></Setter>
-                                </Style>
-                            </StackPanel.Resources>
+                            
                             <Grid >
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="4*"/>
@@ -116,9 +118,13 @@
                             </DockPanel>
                         </StackPanel>
                     </GroupBox>
+                    <DockPanel>
+                        <Label >Telefono:</Label>
+                        <TextBox  Text="{Binding Person.PhoneNumber}"></TextBox>
+                    </DockPanel>
                 </StackPanel>
                 <!-- Note -->
-                <GroupBox Grid.Row="1" Grid.Column="1" Header="Note" VerticalAlignment="Top" Style="{x:Null}" >
+                <GroupBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Header="Note" VerticalAlignment="Top" Style="{x:Null}" >
                     <TextBox Margin="3" MinHeight="50" MaxHeight="80" TextWrapping="Wrap"
                                  Text="{Binding Person.Notes}"
                                  AcceptsReturn="True"
@@ -172,7 +178,7 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="Id" Binding="{Binding Debit.Id}"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Id" Binding="{Binding Debit.Id}" IsReadOnly="True" ></DataGridTextColumn>
                             <DataGridTemplateColumn Header="Descrizione"  >
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -353,6 +359,9 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="Nome Intestatario" Binding="{Binding PayerName}"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Cod.Fisc.Intest." Binding="{Binding PayerCode}"></DataGridTextColumn>
+
                             <DataGridTextColumn Header="Note" Width="1*" MinWidth="200" Binding="{Binding Notes}"></DataGridTextColumn>
                         </DataGrid.Columns>
                     </DataGrid>
