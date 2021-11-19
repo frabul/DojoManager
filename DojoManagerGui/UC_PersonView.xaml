@@ -19,7 +19,8 @@
         <Style TargetType="{x:Type TextBox}">
             <Setter Property="Padding" Value="3" />
         </Style>
-
+        <iconPacks:PackIconMaterialDesign x:Shared="false" Kind="Autorenew" x:Key="AutoRenewIcon"/>
+   
     </UserControl.Resources>
     <ScrollViewer   
             HorizontalContentAlignment="Stretch"
@@ -182,10 +183,11 @@
                             <DataGridTemplateColumn Header="Descrizione"  >
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <ComboBox  Text="{Binding Description}" 
+                                        <ComboBox  Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" 
                                                    ItemsSource="{Binding ElementName=root, Path=DataContext.SubscriptionsSuggested}"
                                                    IsEditable="True"
-                                                   Style="{DynamicResource MahApps.Styles.ComboBox.Virtualized}" ></ComboBox>
+                                                    
+                                                   ></ComboBox>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -241,14 +243,31 @@
                             <DataGridTemplateColumn Header="Associazione"  >
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <ComboBox  Text="{Binding Association}" 
+
+                                        <ComboBox  Text="{Binding Association, UpdateSourceTrigger=PropertyChanged}" 
                                                    ItemsSource="{Binding ElementName=root, Path=DataContext.CardsSuggested}"
                                                    IsEditable="True"
-                                                   Style="{DynamicResource MahApps.Styles.ComboBox.Virtualized}" ></ComboBox>
+                                                   Style="{DynamicResource MahApps.Styles.ComboBox.Virtualized}"  
+                                                   ></ComboBox>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                             <DataGridTextColumn Header="Codice" Binding="{Binding CardId }"></DataGridTextColumn>
+                            <DataGridTemplateColumn Header="Codice"  >
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <DataTemplate.Resources>
+                                       
+                                        </DataTemplate.Resources>
+                                        <TextBox  Text="{Binding CardId}" 
+                                                  Style="{StaticResource MahApps.Styles.TextBox.Button}"
+                                                  mah:TextBoxHelper.ButtonContent="{StaticResource AutoRenewIcon}"
+                                                  mah:TextBoxHelper.ButtonCommand="{Binding ElementName=root, Path=DataContext.AssignNewCodeCommand}"
+                                                  mah:TextBoxHelper.ButtonCommandParameter="{Binding .}"
+                                                  ></TextBox>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn> 
                             <DataGridTemplateColumn Header="Inizio">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
@@ -273,7 +292,7 @@
                 </Grid>
             </Expander>
             <!--   CERTIFICATI   -->
-            <Expander Header="Certificati" Margin="0,1,0,0" IsExpanded="True">
+            <Expander Header="Certificati" Margin="0,1,0,0" IsExpanded="False">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition></RowDefinition>
@@ -360,7 +379,7 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                             <DataGridTextColumn Header="Nome Intestatario" Binding="{Binding PayerName}"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Cod.Fisc.Intest." Binding="{Binding PayerCode}"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Codice Fiscale Intestatario" Binding="{Binding PayerCode}"></DataGridTextColumn>
 
                             <DataGridTextColumn Header="Note" Width="1*" MinWidth="200" Binding="{Binding Notes}"></DataGridTextColumn>
                         </DataGrid.Columns>
@@ -382,6 +401,7 @@
                             <DataGridTemplateColumn Header="" >
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
+                                       
                                         <Button  Height="25" Width="25" Padding="2" 
                                              Command="{Binding Path=DataContext.RemoveExaminationCommand, ElementName=root}" 
                                              CommandParameter="{Binding .}" >

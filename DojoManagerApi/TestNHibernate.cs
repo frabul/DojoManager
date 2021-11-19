@@ -24,7 +24,10 @@ namespace DojoManagerApi
     public class TestNHibernate
     {
 
-        string[] SubscriptionTypes = new string[] { "Ken Sei Dojo - iscrizione annuale", "CIK - iscrizione annuale" };
+        string[] SubscriptionTypes = new string[] { 
+            "Ken Sei Dojo - quota associativa (aaaa/aaaa)",
+            "CIK - quota associativa (aaaa/aaaa)"
+        };
         string[] Associations = new string[] { "Ken Sei Dojo", "CIK" };
         public const string DbFile = "KenseiDojoDb.db";
 

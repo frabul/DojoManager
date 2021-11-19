@@ -176,7 +176,7 @@ namespace DojoManagerApi
 
         public string GetImagePath(Certificate certificate)
         {
-            if ( !string.IsNullOrEmpty(certificate.ImageFileName))
+            if (!string.IsNullOrEmpty(certificate.ImageFileName))
                 return Path.Combine(ImagesDir, certificate.ImageFileName);
             else
                 return null;
@@ -207,6 +207,26 @@ namespace DojoManagerApi
             return new byte[0];
         }
 
+        public string GetNewMembershipCardCode(string association)
+        {
+            return ExecuteWithSession(() =>
+            {
+                var lastCard = CurrentSession
+                                .Query<MembershipCard>()
+                                .Where(c => c.Association.Trim().Equals(association.Trim()))
+                                .OrderByDescending(c => c.CardId).Take(1)
+                                .FirstOrDefault();
+                if (lastCard != null)
+                {
+                    if (int.TryParse(lastCard.CardId, out int cardId)) 
+                        return (cardId + 1).ToString(); 
+                    else
+                        return DateTime.UtcNow.ToString("yyyyMMddHHmmss");
+                }
+                else 
+                    return "1"; 
+            });
+        }
 
         public void AddEntities(IEnumerable<object> entities)
         {
@@ -223,12 +243,12 @@ namespace DojoManagerApi
                 transact.Commit();
             });
         }
-        public MoneyMovement AddNewMovement( Subject subject)
+        public MoneyMovement AddNewMovement(Subject subject)
         {
             var sb = subject;
             if (subject is IEntityWrapper<Subject> entityWrapper)
                 subject = entityWrapper.Origin;
-            var mov = new MoneyMovement() {  Counterpart = subject, Date = DateTime.Now };
+            var mov = new MoneyMovement() { Counterpart = subject, Date = DateTime.Now };
             sb.Movements.Add(mov);
             CurrentSession.Save(mov);
             return mov;
@@ -262,7 +282,7 @@ namespace DojoManagerApi
             {
                 var persons = CurrentSession
                     .Query<MoneyMovement>()
-                    .Where(e => e.Date >= startTime && e.Date <= endTime && e.Counterpart.Id == subjectId) 
+                    .Where(e => e.Date >= startTime && e.Date <= endTime && e.Counterpart.Id == subjectId)
                     .ToList();
                 return persons;
             });

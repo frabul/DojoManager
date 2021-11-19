@@ -109,19 +109,20 @@
                             <local:UC_ListPersons></local:UC_ListPersons>
                         </GroupBox>
                         <GroupBox 
+                            Visibility="{Binding PersonSelected, Converter={mah:StringToVisibilityConverter}}"
                             HeaderStringFormat="DATI PERSONA SELEZIONATA ( {0} )"
                             Header="{Binding PersonSelected.Person.Name, StringFormat=Dati Persona Selezionata{0}}" Margin="1,0,0,0">
                             <local:UC_PersonView DataContext="{Binding PersonSelected}" ></local:UC_PersonView>
                         </GroupBox>
                     </DockPanel> 
                 </DataTemplate>
-                <!--Template for VM_ListPersons-->
+                <!--Template for VM_Subjects-->
                 <DataTemplate DataType="{x:Type ViewModels:VM_Subjects}">
                     <GroupBox Header="Soggetti">
                         <local:UC_Subjects></local:UC_Subjects>
                     </GroupBox>
-                </DataTemplate> 
-            <!--Template for VM_ListPersons-->
+                </DataTemplate>
+                <!--Template for VM_MoneyMovements-->
                 <DataTemplate DataType="{x:Type ViewModels:VM_MoneyMovements}"> 
                     <GroupBox Header="Entrate/Uscite">
                         <local:UC_MoneyMovements></local:UC_MoneyMovements>

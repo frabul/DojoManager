@@ -36,7 +36,9 @@ namespace DojoManagerGui
         {
             DbLocation = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             SuggerimentiAssociazioni = new string[] { NomeAssociazione, "CIK" };
-            SuggerimentiSottoscrizioni = new string[] { "Ken Sei Dojo - iscrizione annuale", "CIK - iscrizione annuale" };
+            SuggerimentiSottoscrizioni = new string[] {
+                "Ken Sei Dojo - quota associativa (aaaa/aaaa)",
+                "CIK - quota associativa (aaaa/aaaa)" };
         }
 
         public static Config Load()

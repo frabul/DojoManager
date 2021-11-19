@@ -136,7 +136,7 @@ namespace DojoManagerGui.ViewModels
             });
 
             SetPersonPictureCommand = new RelayCommand(() => SetPersonPicture());
-
+            AssignNewCodeCommand = new RelayCommand<MembershipCard>(AssignNewCode);
             IsMember = Person.Cards.Where(c =>
                 c.Association == Config.Instance.NomeAssociazione
                 && !c.Invalidated
@@ -153,6 +153,19 @@ namespace DojoManagerGui.ViewModels
             dispatcherTimer.Start();
         }
 
+        private void AssignNewCode(MembershipCard? card)
+        {
+            if (card == null || string.IsNullOrEmpty(card.Association))
+                return;
+            var otherCards = card.Person.Cards.Where((c) => c.Association == card.Association && c != card);
+            if (otherCards.Any())
+                card.CardId = otherCards.First().CardId;
+            else
+            {
+                card.CardId = App.Db.GetNewMembershipCardCode(card.Association);
+            }
+
+        }
 
         public bool IsMember { get; private set; }
         public virtual void OnPropertyChanged(string propertyName)
@@ -171,7 +184,9 @@ namespace DojoManagerGui.ViewModels
 
         public IEnumerable<DebitPayment> Payments => Person.Subscriptions.SelectMany(s => s.Debit.Payments).ToList();
         public IList<Subscription> Subscriptions => Person.Subscriptions;
-        public string[] DefaultSubscriptions { get; } = new string[] { "Iscrizione annuale Kensei Dojo", "Iscrizione annuale CIK" };
+        public string[] DefaultSubscriptions { get; } = new string[] {
+            "Iscrizione annuale Kensei Dojo",
+            "Iscrizione annuale CIK" };
 
         public RelayCommand AddSubscriptionCommand { get; }
         public RelayCommand<Subscription> RemoveSubscriptionCommand { get; }
@@ -189,6 +204,7 @@ namespace DojoManagerGui.ViewModels
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
+        public RelayCommand<MembershipCard> AssignNewCodeCommand { get; }
 
         public void ShowCertificateImage(Certificate cert)
         {
