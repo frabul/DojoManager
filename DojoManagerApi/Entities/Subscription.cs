@@ -5,8 +5,10 @@ namespace DojoManagerApi.Entities
 
 
     [WrapMe]
-    public class Subscription
+    public class Subscription : IEntityWrapper<Subscription>
     {
+        [AutomapIgnore]
+        public virtual Subscription Origin => this;
         public virtual int Id { get; set; }
         public virtual Person Person { get; set; }
         public virtual Debit Debit { get; set; }

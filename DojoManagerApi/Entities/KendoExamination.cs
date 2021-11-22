@@ -30,7 +30,7 @@ namespace DojoManagerApi.Entities
     {
         public virtual int Id { get; set; }
         public virtual Person Person {get;set; }
-        public virtual bool Passed { get; set; }
+        public virtual bool Passed { get; set; } = true;
         public virtual KendoDegree DegreeAcquired { get; set; }
         public virtual DateTime Date { get; set; }
         public virtual string Location { get; set; }

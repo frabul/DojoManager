@@ -46,8 +46,9 @@ namespace DojoManagerApi.Entities
         {
             var deb = new Debit() { Amount = cost };
             subscription.Debit = deb;
-            subscription.Person = Origin;
-            Subscriptions.Add(subscription);
+            subscription.Person = Origin; 
+            deb.Subscription = subscription.Origin;
+            Subscriptions.Add(subscription.Origin);
             //this.Debits.Add(deb);
             //return deb;
         }
@@ -63,8 +64,8 @@ namespace DojoManagerApi.Entities
             foreach (var p in s.Debit.Payments.ToArray())
             {
                 s.Debit.RemovePayment(p);
-            }
-            //s.Debit.Person = null; 
+            } 
+            s.Debit.Subscription = null;
             s.Debit = null;
             s.Person = null;
             Subscriptions.Remove(s);

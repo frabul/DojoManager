@@ -137,6 +137,10 @@ namespace DojoManagerGui.ViewModels
 
             SetPersonPictureCommand = new RelayCommand(() => SetPersonPicture());
             AssignNewCodeCommand = new RelayCommand<MembershipCard>(AssignNewCode);
+            PrintReceiptCommand = new RelayCommand<DebitPayment>(PrintReceipt);
+
+
+
             IsMember = Person.Cards.Where(c =>
                 c.Association == Config.Instance.NomeAssociazione
                 && !c.Invalidated
@@ -205,6 +209,7 @@ namespace DojoManagerGui.ViewModels
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public RelayCommand<MembershipCard> AssignNewCodeCommand { get; }
+        public RelayCommand<DebitPayment> PrintReceiptCommand { get; }
 
         public void ShowCertificateImage(Certificate cert)
         {
@@ -248,5 +253,30 @@ namespace DojoManagerGui.ViewModels
                 return image;
             }
         }
+
+
+
+        public void PrintReceipt(DebitPayment? payment)
+        {
+            Dictionary<string, string> variables = new();
+            variables.Add("num_ric", payment.Id.ToString());
+            variables.Add("data_ric", payment.Date.ToString("yyyy/MM/dd"));
+            variables.Add("nome_intestatario", payment.PayerName);
+            variables.Add("nome_socio", payment.Debit.Subscription.Person.Name);
+            variables.Add("cod_fisc_intestatario", payment.PayerCode);
+            variables.Add("cod_fisc_socio", payment.Debit.Subscription.Person.TaxIdentificationNumber);
+            variables.Add("luogo_nascita", payment.Debit.Subscription.Person.BirthLocation);
+            variables.Add("nasc_dat", payment.Debit.Subscription.Person.BirthDate.ToString("yyyy/MM/dd"));
+            variables.Add("dettaglio_ric", payment.Debit.Subscription.Description);
+            variables.Add("importo_ric", payment.Amount.ToString());
+            variables.Add("totale_ric", payment.Amount.ToString());
+            variables.Add("causale_ric", payment.Notes);
+
+            DocTemplateCompiler.Compile("RicevutaKSD.docx", @"C:\Users\ITFRBUL\Documents\Ricevuta.docx", variables);
+        }
+
+
+
     }
+
 }

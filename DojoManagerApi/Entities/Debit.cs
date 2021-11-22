@@ -8,11 +8,13 @@ namespace DojoManagerApi.Entities
     {
         public virtual int Id { get; set; }
         public virtual decimal Amount { get; set; }
-        //public virtual Person Person { get; set; }
-
+        public virtual Subscription Subscription { get; set; }
         public virtual IList<DebitPayment> Payments { get; set; }
         [AutomapIgnore]
         public virtual Debit Origin => this;
+
+       
+
         public Debit()
         {
             Payments = new List<DebitPayment>();

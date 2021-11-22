@@ -20,7 +20,12 @@
             <Setter Property="Padding" Value="3" />
         </Style>
         <iconPacks:PackIconMaterialDesign x:Shared="false" Kind="Autorenew" x:Key="AutoRenewIcon"/>
-   
+        <Path x:Shared="false" x:Key="DeleteButton"  Stretch="Fill"  Fill="Black" 
+                Data="M20,6H16V5a3,3,0,0,0-3-3H11A3,3,0,0,0,8,5V6H4A1,1,0,0,0,4,8H5V19a3,3,0,0,0,3,3h8a3,3,0,0,0,3-3V8h1a1,1,0,0,0,0-2ZM10,5a1,1,0,0,1,1-1h2a1,1,0,0,1,1,1V6H10Zm7,14a1,1,0,0,1-1,1H8a1,1,0,0,1-1-1V8H17Z">
+        </Path>
+        <Path x:Shared="false" x:Key="PrintButton"  Stretch="Fill"  Fill="Black" 
+                Data="M860.4 812.5L937.5 812.5V500H812.5V62.5H187.5V500H62.5V812.5H139.6L72.9 937.5H927.1L860.4 812.5ZM250 125H750V500H250V125ZM243.7 750H756.3L822.9 875H177.1L243.7 750Z">
+        </Path>
     </UserControl.Resources>
     <ScrollViewer   
             HorizontalContentAlignment="Stretch"
@@ -361,10 +366,21 @@
                                     <DataTemplate>
                                         <Button  Height="25" Width="25" Padding="2" 
                                             Command="{Binding Path=DataContext.RemovePaymentCommand, ElementName=root}" 
-                                            CommandParameter="{Binding .}" >
-                                            <Path   Stretch="Fill"  Fill="Black" 
-                                            Data="M20,6H16V5a3,3,0,0,0-3-3H11A3,3,0,0,0,8,5V6H4A1,1,0,0,0,4,8H5V19a3,3,0,0,0,3,3h8a3,3,0,0,0,3-3V8h1a1,1,0,0,0,0-2ZM10,5a1,1,0,0,1,1-1h2a1,1,0,0,1,1,1V6H10Zm7,14a1,1,0,0,1-1,1H8a1,1,0,0,1-1-1V8H17Z">
-                                            </Path>
+                                            CommandParameter="{Binding .}"
+                                            Content="{StaticResource DeleteButton}">
+                                            
+                                        </Button>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="" >
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button  Height="25" Width="25" Padding="2" 
+                                            Command="{Binding Path=DataContext.PrintReceiptCommand, ElementName=root}" 
+                                            CommandParameter="{Binding .}"
+                                            Content="{StaticResource PrintButton}">
+
                                         </Button>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
@@ -412,7 +428,7 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridCheckBoxColumn Header="Superato" Binding="{Binding Passed}"></DataGridCheckBoxColumn>
+                            <!--<DataGridCheckBoxColumn Header="Superato" Binding="{Binding Passed}"></DataGridCheckBoxColumn>-->
                             <DataGridTemplateColumn Header="Grado" >
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
