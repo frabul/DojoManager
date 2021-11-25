@@ -46,6 +46,8 @@ namespace DojoManagerGui.ViewModels
     {
         public VM_Person(Person person)
         {
+            if (person.Address == null)
+                person.Address = new Address();
 
             Person = (Person)EntityWrapper.Wrap(person);
             var hash = Person.GetHashCode();
@@ -138,7 +140,7 @@ namespace DojoManagerGui.ViewModels
             SetPersonPictureCommand = new RelayCommand(() => SetPersonPicture());
             AssignNewCodeCommand = new RelayCommand<MembershipCard>(AssignNewCode);
             PrintReceiptCommand = new RelayCommand<DebitPayment>(PrintReceipt);
-
+            PrintMemberCardCommand = new RelayCommand(PrintMemberCard, () => IsMember);
 
 
             IsMember = Person.Cards.Where(c =>
@@ -157,26 +159,10 @@ namespace DojoManagerGui.ViewModels
             dispatcherTimer.Start();
         }
 
-        private void AssignNewCode(MembershipCard? card)
-        {
-            if (card == null || string.IsNullOrEmpty(card.Association))
-                return;
-            var otherCards = card.Person.Cards.Where((c) => c.Association == card.Association && c != card);
-            if (otherCards.Any())
-                card.CardId = otherCards.First().CardId;
-            else
-            {
-                card.CardId = App.Db.GetNewMembershipCardCode(card.Association);
-            }
 
-        }
 
         public bool IsMember { get; private set; }
-        public virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
+        public event PropertyChangedEventHandler? PropertyChanged;
         public Person Person { get; }
         public decimal Debit => Person.Subscriptions.Select(s => s.Debit).Sum(d => d.Amount - d.Payments.Sum(pay => pay.Amount));
         public DateTime? CertiFicateExpiration => Person.Certificates.OrderByDescending(c => c.Expiry).FirstOrDefault()?.Expiry;
@@ -195,7 +181,6 @@ namespace DojoManagerGui.ViewModels
         public RelayCommand AddSubscriptionCommand { get; }
         public RelayCommand<Subscription> RemoveSubscriptionCommand { get; }
         public RelayCommand<Subscription> AddPaymentCommand { get; }
-
         public RelayCommand AddNewCard { get; }
         public RelayCommand<MembershipCard> RemoveCard { get; }
         public RelayCommand AddNewCertificate { get; }
@@ -205,32 +190,13 @@ namespace DojoManagerGui.ViewModels
         public RelayCommand AddExaminationCommand { get; }
         public RelayCommand<KendoExamination> RemoveExaminationCommand { get; }
         public RelayCommand SetPersonPictureCommand { get; }
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
         public RelayCommand<MembershipCard> AssignNewCodeCommand { get; }
         public RelayCommand<DebitPayment> PrintReceiptCommand { get; }
-
-        public void ShowCertificateImage(Certificate cert)
-        {
-            var vm = new VM_ImageViewer(cert);
-            var win = new Window_ImageViewer() { DataContext = vm };
-            win.ShowDialog();
-            cert.ImageFileName = vm.ImageFilePath;
-        }
-
-        public void SetPersonPicture()
-        {
-            var selectedPicture = App.SelectImage();
-            if (selectedPicture != null)
-            {
-                App.Db.SetImage(Person, selectedPicture);
-            }
-            OnPropertyChanged(nameof(PersonPicture));
-        }
         public List<object> KendoDegrees => EnumKendDegreeUtils.GetDegreeList();
         public string[] SubscriptionsSuggested => Config.Instance.SuggerimentiSottoscrizioni;
         public string[] CardsSuggested => Config.Instance.SuggerimentiAssociazioni;
+        public RelayCommand PrintMemberCardCommand { get; }
+        public string[] MemberTypesSuggested => Config.Instance.SuggerimentiTipiSocio;
         public ImageSource PersonPicture
         {
             get
@@ -255,6 +221,40 @@ namespace DojoManagerGui.ViewModels
         }
 
 
+        public void SetPersonPicture()
+        {
+            var selectedPicture = App.SelectImage();
+            if (selectedPicture != null)
+            {
+                App.Db.SetImage(Person, selectedPicture);
+            }
+            OnPropertyChanged(nameof(PersonPicture));
+        }
+
+        public void ShowCertificateImage(Certificate cert)
+        {
+            var vm = new VM_ImageViewer(cert);
+            var win = new Window_ImageViewer() { DataContext = vm };
+            win.ShowDialog();
+            cert.ImageFileName = vm.ImageFilePath;
+        }
+        private void AssignNewCode(MembershipCard? card)
+        {
+            if (card == null || string.IsNullOrEmpty(card.Association))
+                return;
+            var otherCards = card.Person.Cards.Where((c) => c.Association == card.Association && c != card);
+            if (otherCards.Any())
+                card.CardId = otherCards.First().CardId;
+            else
+            {
+                card.CardId = App.Db.GetNewMembershipCardCode(card.Association);
+            }
+
+        }
+        public virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         public void PrintReceipt(DebitPayment? payment)
         {
@@ -274,7 +274,10 @@ namespace DojoManagerGui.ViewModels
 
             DocTemplateCompiler.Compile("RicevutaKSD.docx", @"C:\Users\ITFRBUL\Documents\Ricevuta.docx", variables);
         }
+        private void PrintMemberCard()
+        {
 
+        }
 
 
     }

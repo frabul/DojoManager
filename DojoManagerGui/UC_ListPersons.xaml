@@ -55,6 +55,16 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="" >
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Height="25" Width="25" Padding="2" 
+                                        Command="{Binding PrintMemberCardCommand}"  
+                                        Content="{StaticResource PrintButton}"> 
+                                </Button>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                     <DataGridTextColumn IsReadOnly="True" Header="Nome" Binding="{Binding Person.Name}"></DataGridTextColumn>
                     <DataGridTextColumn IsReadOnly="True" Header="Iscrizione" Binding="{Binding CertiFicateExpiration, StringFormat=d}"></DataGridTextColumn>
                     <DataGridTextColumn IsReadOnly="True" Header="Scad. Cert." Binding="{Binding CertiFicateExpiration, StringFormat=d}"></DataGridTextColumn>

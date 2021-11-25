@@ -30,6 +30,7 @@ namespace DojoManagerGui
         public string DbName => NomeAssociazione.Replace(' ', '_') + "_db";
         public string[] SuggerimentiAssociazioni { get; set; }
         public string[] SuggerimentiSottoscrizioni { get; set; }
+        public string[] SuggerimentiTipiSocio { get; set; }
         public string DbLocation { get; set; }
 
         public Config()
@@ -39,6 +40,7 @@ namespace DojoManagerGui
             SuggerimentiSottoscrizioni = new string[] {
                 "Ken Sei Dojo - quota associativa (aaaa/aaaa)",
                 "CIK - quota associativa (aaaa/aaaa)" };
+            SuggerimentiTipiSocio = new string[] { "Fondatore", "Onorario", "Ordinario" };
         }
 
         public static Config Load()

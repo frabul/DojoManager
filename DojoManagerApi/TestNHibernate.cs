@@ -218,6 +218,9 @@ namespace DojoManagerApi
             {
                 var pi = InitialPersons[i];
                 var pn = persons[i];
+
+                Assert.AreEqual(pi.Address.City, pn.Address.City);
+
                 //var pdb = pn.Subscriptions[0].Debit.Person;
                 var debit_0_0 = pn.Subscriptions[0].Debit;
                 var payments = debit_0_0.Payments;

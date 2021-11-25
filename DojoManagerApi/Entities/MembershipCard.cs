@@ -9,6 +9,7 @@ namespace DojoManagerApi.Entities
         public virtual int Id { get; set; }
         public virtual Person Person { get; set; }
         public virtual string CardId { get; set; }
+        public virtual string MemberType { get; set; }
         public virtual DateTime ValidityStartDate { get; set; }
         public virtual DateTime ExpirationDate { get; set; }
         public virtual string Association { get; set; }
@@ -17,7 +18,6 @@ namespace DojoManagerApi.Entities
         public override string ToString()
         {
             return $"{{ Id:{Id}, Type:{Association}, CardId: {CardId}, Year:{ValidityStartDate:yyyy}, Disabled: {Invalidated} }}";
-        }
-        //public virtual Person Person { get; set; }
+        } 
     }
 }

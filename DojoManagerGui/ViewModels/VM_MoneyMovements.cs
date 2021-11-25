@@ -40,12 +40,29 @@ namespace DojoManagerGui.ViewModels
         public string SubjectNameFilter { get; set; }
         public bool IsFiltersBoxVisible { get; set; }
         public bool IsAddAddButtonVisible { get; set; }
+
+        public int MovementsCount => Movements.Count;
+        public decimal Incomes
+        {
+            get
+            {
+                return Movements.Where(m => m.Direction == MoneyMovementDirection.In).Sum(m => m.Amount);
+            }
+        }
+        public decimal Expenses
+        {
+            get { return Movements.Where(m => m.Direction == MoneyMovementDirection.Out).Sum(m => m.Amount); }
+        }
+        public decimal MovementsTotal
+        {
+            get { return Movements.Sum(m => m.Direction == MoneyMovementDirection.In ? m.Amount : -m.Amount); }
+        }
         public VM_MoneyMovements(Subject subjectAssociated)
         {
             SubjectAssociated = subjectAssociated;
             Movements = new ObservableCollection<MoneyMovement>();
             Refresh();
-            RemoveMovementCommand = new RelayCommand<MoneyMovement>(RemoveMovementFAsync);
+            RemoveMovementCommand = new RelayCommand<MoneyMovement>(RemoveMovement);
             AddNewMovementCommand = new RelayCommand(AddNewMovement);
             SearchCommand = new RelayCommand(Refresh);
             WeakReferenceMessenger.Default.Register<EntityListChangedMessage<MoneyMovement>>(this,
@@ -94,7 +111,7 @@ namespace DojoManagerGui.ViewModels
                    new EntityListChangedMessage<MoneyMovement>(this, new MoneyMovement[] { mov }, Array.Empty<MoneyMovement>()));
             }
         }
-        private async void RemoveMovementFAsync(MoneyMovement? obj)
+        private async void RemoveMovement(MoneyMovement? obj)
         {
             if (obj != null)
             {
@@ -108,9 +125,11 @@ namespace DojoManagerGui.ViewModels
                 {
                     await App.AskAndExecuteAsync(() =>
                     {
+                        this.Movements.Remove(obj);
+                        obj.Counterpart.Movements.Remove(obj);
                         App.Db.Delete(obj);
                         App.Db.Save();
-                        this.Movements.Remove(obj);
+                   
                         WeakReferenceMessenger.Default.Send(
                             new EntityListChangedMessage<MoneyMovement>(this, Array.Empty<MoneyMovement>(), new MoneyMovement[] { obj }));
                     });

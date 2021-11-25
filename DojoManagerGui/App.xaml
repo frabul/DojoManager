@@ -5,9 +5,15 @@
              xmlns:system="clr-namespace:System;assembly=System"
              >
     <Application.Resources>
-
+       
 
         <ResourceDictionary>
+            <Path x:Shared="false" x:Key="DeleteButton"  Stretch="Fill"  Fill="Black" 
+                Data="M20,6H16V5a3,3,0,0,0-3-3H11A3,3,0,0,0,8,5V6H4A1,1,0,0,0,4,8H5V19a3,3,0,0,0,3,3h8a3,3,0,0,0,3-3V8h1a1,1,0,0,0,0-2ZM10,5a1,1,0,0,1,1-1h2a1,1,0,0,1,1,1V6H10Zm7,14a1,1,0,0,1-1,1H8a1,1,0,0,1-1-1V8H17Z">
+            </Path>
+            <Path x:Shared="false" x:Key="PrintButton"  Stretch="Fill"  Fill="Black" 
+                Data="M860.4 812.5L937.5 812.5V500H812.5V62.5H187.5V500H62.5V812.5H139.6L72.9 937.5H927.1L860.4 812.5ZM250 125H750V500H250V125ZM243.7 750H756.3L822.9 875H177.1L243.7 750Z">
+            </Path>
             <DataTemplate DataType="{x:Type system:DateTime}">
                 <DatePicker  SelectedDate="{Binding ., Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="100" ></DatePicker>
             </DataTemplate>
@@ -35,8 +41,8 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
-
             </ResourceDictionary.MergedDictionaries>
+            
         </ResourceDictionary>
     </Application.Resources>
 

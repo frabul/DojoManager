@@ -15,7 +15,7 @@ namespace DojoManagerGui
         {
             if (enumType == null)
                 throw new ArgumentNullException("enumType");
-
+            _enumType = enumType;
             EnumType = enumType;
         }
 
