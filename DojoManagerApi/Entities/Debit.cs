@@ -36,6 +36,8 @@ namespace DojoManagerApi.Entities
         {
             debitPayment.Debit = null;
             var ok = this.Payments.Remove(debitPayment);
+            debitPayment.Receipt.Movement = null;
+            debitPayment.Receipt = null;
         }
         public override string ToString()
         {

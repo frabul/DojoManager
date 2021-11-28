@@ -16,6 +16,7 @@ namespace DojoManagerApi.Entities
         public virtual DateTime BirthDate { get; set; }
         public virtual string BirthLocation { get; set; }
         public virtual string PictureFileName { get; set; }
+        public virtual string SecondName { get; set; }
         public virtual IList<Certificate> Certificates { get; set; } = new List<Certificate>();
         public virtual IList<Subscription> Subscriptions { get; set; } = new List<Subscription>();
         public virtual IList<MembershipCard> Cards { get; set; } = new List<MembershipCard>();
@@ -23,6 +24,8 @@ namespace DojoManagerApi.Entities
 
         [AutomapIgnore]
         public virtual Person Origin => this;
+        [AutomapIgnore]
+        public virtual string FullName => $"{Name} {SecondName}";
 
         public virtual void RemoveCard(MembershipCard c)
         {

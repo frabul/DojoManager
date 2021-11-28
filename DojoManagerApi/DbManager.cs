@@ -181,7 +181,13 @@ namespace DojoManagerApi
             else
                 return null;
         }
-
+        public string GetImagePath(Person person)
+        {
+            if (!string.IsNullOrEmpty(person.PictureFileName))
+                return Path.Combine(ImagesDir, person.PictureFileName);
+            else
+                return null;
+        }
         public byte[] GetImageBytes(Person person)
         {
             if (!string.IsNullOrEmpty(person.PictureFileName))
@@ -207,6 +213,25 @@ namespace DojoManagerApi
             return new byte[0];
         }
 
+        public void SetReceiptNumber(Receipt receipt)
+        {
+            ExecuteWithSession(() =>
+            {
+                var year_start = new DateTime(receipt.Movement.Date.Year, 1, 1);
+                var year_end = year_start.AddYears(1);
+                var lastRec = CurrentSession
+                                .Query<Receipt>()
+                                .Where(r => r.Date >= year_start && r.Date < year_end)
+                                .OrderByDescending(c => c.NumberInYear)
+                                .Take(1)
+                                .FirstOrDefault();
+                if (lastRec != null) 
+                    receipt.NumberInYear = lastRec.NumberInYear + 1; 
+                else 
+                    receipt.NumberInYear = 1;  
+            });
+        }
+
         public string GetNewMembershipCardCode(string association)
         {
             return ExecuteWithSession(() =>
@@ -218,13 +243,13 @@ namespace DojoManagerApi
                                 .FirstOrDefault();
                 if (lastCard != null)
                 {
-                    if (int.TryParse(lastCard.CardId, out int cardId)) 
-                        return (cardId + 1).ToString(); 
+                    if (int.TryParse(lastCard.CardId, out int cardId))
+                        return (cardId + 1).ToString();
                     else
                         return DateTime.UtcNow.ToString("yyyyMMddHHmmss");
                 }
-                else 
-                    return "1"; 
+                else
+                    return "1";
             });
         }
 
@@ -333,6 +358,6 @@ namespace DojoManagerApi
                 throw new Exception("No session.");
         }
 
-
+       
     }
 }

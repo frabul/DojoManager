@@ -11,6 +11,12 @@ namespace DojoManagerApi.Entities
         public virtual Debit Debit { get; set; }
         public virtual string PayerName { get; set; }
         public virtual string PayerCode { get; set; }
+        public virtual Receipt Receipt { get; set; }
+
+        public DebitPayment()
+        {
+            Direction = MoneyMovementDirection.In;
+        }
 
         public override MoneyMovementDirection Direction
         {
@@ -22,9 +28,26 @@ namespace DojoManagerApi.Entities
                 base.Direction = value;
             }
         }
-        public DebitPayment()
-        {
-            Direction = MoneyMovementDirection.In;
-        }
+      
     }
+    [WrapMe]
+    public class Receipt 
+    {
+        public virtual int Id { get; set; }
+        public virtual int NumberInYear { get; set; }
+        public virtual DateTime Date { get; set; }
+        public virtual MoneyMovement Movement { get; set; }  
+        public Receipt(MoneyMovement movement)
+        {
+            Movement = movement;
+            Date = movement.Date;
+        }
+        public Receipt( )
+        { 
+        }
+
+    }
+
+
+
 }
