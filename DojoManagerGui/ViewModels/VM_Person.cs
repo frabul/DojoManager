@@ -92,23 +92,7 @@ namespace DojoManagerGui.ViewModels
                         });
                     }
                 );
-            AddPaymentCommand = new RelayCommand<Subscription>(
-                    s =>
-                    {
-                        if (s != null)
-                        {
-                            var mov = s.Debit.AddPayment(0, DateTime.Now, Person.Origin);
-                            App.Db.Save();
-                            this.OnPropertyChanged(nameof(Payments));
-                            WeakReferenceMessenger.Default.Send(
-                                new EntityListChangedMessage<MoneyMovement>(
-                                    this,
-                                    new MoneyMovement[] { mov },
-                                    Array.Empty<MoneyMovement>()));
-
-                        }
-                    }
-                ); ;
+            AddPaymentCommand = new RelayCommand<Subscription>(AddPayment);
             RemovePaymentCommand = new RelayCommand<DebitPayment>(async dp =>
             {
                 if (dp != null)
@@ -159,7 +143,31 @@ namespace DojoManagerGui.ViewModels
             dispatcherTimer.Start();
         }
 
+        private void AddPayment(Subscription? s)
+        {
+            if (s == null)
+                return;
 
+            //add payment
+            var mov = s.Debit.AddPayment(0, DateTime.Now, Person.Origin);
+            mov.PayerName = Person.FullName;
+            mov.PayerCode = Person.TaxIdentificationNumber;
+
+            //set receipt for payment
+            mov.Receipt = new Receipt(mov);
+            App.Db.SetReceiptNumber(mov.Receipt);
+
+            //save 
+            App.Db.Save();
+            this.OnPropertyChanged(nameof(Payments));
+            WeakReferenceMessenger.Default.Send(
+                new EntityListChangedMessage<MoneyMovement>(
+                    this,
+                    new MoneyMovement[] { mov },
+                    Array.Empty<MoneyMovement>()));
+
+
+        }
 
         public bool IsMember { get; private set; }
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -258,11 +266,15 @@ namespace DojoManagerGui.ViewModels
 
         public void PrintReceipt(DebitPayment? payment)
         {
-            Dictionary<string, string> variables = new();
-            variables.Add("num_ric", payment.Id.ToString());
+            if (payment == null)
+                return;
+            Dictionary<string, object> variables = new();
+            var numRicevuta = $"{payment.Receipt.NumberInYear}/{payment.Receipt.Date.Year}";
+            var nomeCompleto = $"{Person.Name} {Person.SecondName}";
+            variables.Add("num_ric", numRicevuta);
             variables.Add("data_ric", payment.Date.ToString("yyyy/MM/dd"));
             variables.Add("nome_intestatario", payment.PayerName);
-            variables.Add("nome_socio", payment.Debit.Subscription.Person.Name);
+            variables.Add("nome_socio", nomeCompleto);
             variables.Add("cod_fisc_intestatario", payment.PayerCode);
             variables.Add("cod_fisc_socio", payment.Debit.Subscription.Person.TaxIdentificationNumber);
             variables.Add("luogo_nascita", payment.Debit.Subscription.Person.BirthLocation);
@@ -272,11 +284,85 @@ namespace DojoManagerGui.ViewModels
             variables.Add("totale_ric", payment.Amount.ToString());
             variables.Add("causale_ric", payment.Notes);
 
-            DocTemplateCompiler.Compile("RicevutaKSD.docx", @"C:\Users\ITFRBUL\Documents\Ricevuta.docx", variables);
+            try
+            {
+                var targetDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                var targetFileName = $"Ricevuta_KSD_{numRicevuta}.docx".Replace("/","-");
+                DocTemplateCompiler.Compile(
+                    "RicevutaKSD.docx", 
+                    Path.Combine(targetDir,targetFileName), 
+                    variables);
+            }
+            catch (Exception ex)
+            {
+                App.ShowMessage("Errore", $"Errore nel salvataggio della ricevuta: {ex.Message}");
+            }
+
         }
         private void PrintMemberCard()
         {
+            var dojoCard = Person.Cards
+                .Where(c => c.Association == Config.Instance.NomeAssociazione)
+                .OrderByDescending(c => c.ExpirationDate)
+                .FirstOrDefault();
+            if (dojoCard == null)
+            {
+                App.ShowMessage("Errore", $"Tessera di socio non trovata");
+                return;
+            }
 
+            Dictionary<string, object> variables = new();
+            var imgPath = App.Db.GetImagePath(Person);
+            BitmapImage img = new BitmapImage(new Uri(imgPath));
+            variables.Add("foto_soc", img);
+            variables.Add("n_i", dojoCard.CardId.ToString());
+            variables.Add("data_i", DateTime.Now.ToString("yyyy/MM/dd"));
+            variables.Add("tipo_soc", dojoCard.MemberType);
+            variables.Add("cognome_soc", Person.SecondName);
+            variables.Add("nome_soc", Person.Name);
+            variables.Add("luogo_nascita", Person.BirthLocation);
+            variables.Add("data_nascita", Person.BirthDate.ToString("yyyy/MM/dd"));
+            variables.Add("cod_fisc", Person.TaxIdentificationNumber);
+            variables.Add("luogo_residenza", Person.Address.City);
+            variables.Add("cap_res", Person.Address.PostCode);
+            variables.Add("indirizzo_soc", $"{Person.Address.Street}, {Person.Address.Number}");
+            variables.Add("tel_soc", Person.PhoneNumber);
+            variables.Add("email_soc", Person.EMail);
+            variables.Add("altri_recapiti", "");
+            var examinations = Person.Examinations.OrderBy(x => x.DegreeAcquired).ToArray();
+
+            for (int i = 0; i < 13; i++)
+            {
+                string luogo = i >= examinations.Length ? "" : examinations[i].Location;
+                string data = i >= examinations.Length ? "" : examinations[i].Date.ToString("yyyy/MM/dd");
+
+                if (luogo == null)
+                    luogo = "";
+
+                if (i < 5)
+                {
+                    variables.Add($"{5 - i}kyu_luogo", luogo);
+                    variables.Add($"{5 - i}kyu_data", data);
+                }
+                else
+                {
+                    variables.Add($"{i - 4}dan_luogo", luogo);
+                    variables.Add($"{i - 4}dan_data", data);
+                }
+
+            }
+         
+            variables.Add("data_rec", "");
+            try
+            {
+                var targetDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                var targetFileName = $"Scheda_Socio_KSD_{Person.Name}_{Person.SecondName}.docx";
+                DocTemplateCompiler.Compile("SchedaLibroSociKSD.docx", Path.Combine(targetDir, targetFileName), variables);
+            }
+            catch (Exception ex)
+            {
+                App.ShowMessage("Errore", $"Errore nel salvataggio della scheda: {ex.Message}");
+            }
         }
 
 

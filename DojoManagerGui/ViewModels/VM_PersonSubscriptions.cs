@@ -25,7 +25,7 @@ namespace DojoManagerGui.ViewModels
 
         public VM_PersonSubscriptions(Person person)
         {
-
+         
             Person = (Person)EntityWrapper.Wrap(person);
             AddSubscriptionCommand = new RelayCommand(
                     () => Person.AddSubscription(new Subscription(), 0),
@@ -37,6 +37,7 @@ namespace DojoManagerGui.ViewModels
             AddPaymentCommand = new RelayCommand<Subscription>(
                     s => s.Debit.AddPayment(0, DateTime.Now, Person.Origin)
                 );
+            throw new NotImplementedException();
         }
 
     }

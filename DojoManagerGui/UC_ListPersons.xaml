@@ -36,7 +36,7 @@
                     </WrapPanel>
                 </StackPanel>
             </GroupBox>
-            <Button Grid.Row="1" Command="{Binding AddNewPersonCommand}">Aggiungi</Button>
+            <Button Grid.Row="1" Command="{Binding AddNewPersonCommand}">Aggiungi Persona</Button>
             <DataGrid Grid.Row="2" ItemsSource="{Binding People}" 
                       SelectedItem="{Binding PersonSelected}" 
                       AutoGenerateColumns="False"
@@ -65,8 +65,15 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTextColumn IsReadOnly="True" Header="Nome" Binding="{Binding Person.Name}"></DataGridTextColumn>
-                    <DataGridTextColumn IsReadOnly="True" Header="Iscrizione" Binding="{Binding CertiFicateExpiration, StringFormat=d}"></DataGridTextColumn>
+                    <DataGridTextColumn IsReadOnly="True" Header="Nome" >
+                        <DataGridTextColumn.Binding>
+                            <MultiBinding StringFormat="{}{0} {1}">
+                                <Binding Path="Person.Name" />
+                                <Binding Path="Person.SecondName" />
+                            </MultiBinding>
+                        </DataGridTextColumn.Binding>
+                    </DataGridTextColumn>
+                    <DataGridCheckBoxColumn IsReadOnly="True" Header="Socio" Binding="{Binding IsMember, Mode=OneWay}"></DataGridCheckBoxColumn>
                     <DataGridTextColumn IsReadOnly="True" Header="Scad. Cert." Binding="{Binding CertiFicateExpiration, StringFormat=d}"></DataGridTextColumn>
                     <DataGridTextColumn IsReadOnly="True" Header="Debiti" Binding="{Binding Debit}"></DataGridTextColumn>
                 </DataGrid.Columns>

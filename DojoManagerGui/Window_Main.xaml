@@ -6,12 +6,12 @@
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"  
                  xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
                  xmlns:local="clr-namespace:DojoManagerGui"
-                 Title="DojoManager"
+                 Title="DojoManager v.0.2"
                  Height="800"
                  Width="1400"
                  >
     <Window.InputBindings>
-        <KeyBinding Modifiers="Control" Key="S" />
+        <!--<KeyBinding Modifiers="Control" Key="S" />-->
     </Window.InputBindings>
     <mah:MetroWindow.Resources>
          
@@ -22,7 +22,7 @@
             <Setter Property="TextAlignment"   Value="Center"></Setter>
         </Style>
     </mah:MetroWindow.Resources>
-    <mah:MetroWindow.LeftWindowCommands>
+    <!--<mah:MetroWindow.LeftWindowCommands>
         <mah:WindowCommands>
             <StackPanel Orientation="Horizontal">
                 <Button ToolTip="Save">
@@ -34,7 +34,7 @@
                 <iconPacks:PackIconModern Kind="Disk" />
             </Button>
         </mah:WindowCommands>
-    </mah:MetroWindow.LeftWindowCommands>
+    </mah:MetroWindow.LeftWindowCommands>-->
 
     <Grid>
         <Grid.ColumnDefinitions>
