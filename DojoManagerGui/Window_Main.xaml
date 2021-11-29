@@ -103,10 +103,10 @@
                         Grid.Row="1">
             <ContentControl.Resources>
                 <!--Template for VM_ListPersons-->
-                <DataTemplate DataType="{x:Type ViewModels:VM_ListPersons}">
+                <DataTemplate DataType="{x:Type ViewModels:VM_ListPeople}">
                     <DockPanel  >
                         <GroupBox Header="Lista">
-                            <local:UC_ListPersons></local:UC_ListPersons>
+                            <local:UC_ListPeople></local:UC_ListPeople>
                         </GroupBox>
                         <GroupBox 
                             Visibility="{Binding PersonSelected, Converter={mah:StringToVisibilityConverter}}"

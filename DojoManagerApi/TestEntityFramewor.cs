@@ -14,7 +14,7 @@ namespace DojoManagerApi
     {
         public DbSet<Subject> Subjects { get; set; }
         public DbSet<MoneyMovement> Transactions { get; set; }
-        public DbSet<Person> Persons { get; set; }
+        public DbSet<Person> People { get; set; }
         public string DbPath { get; private set; }
 
         public DojoManagerContext()
@@ -61,7 +61,7 @@ namespace DojoManagerApi
 
                 // Read
                 Console.WriteLine("Querying for all subjects");
-                persons = db.Persons
+                persons = db.People
                     .OrderBy(b => b.Name)
                     .ToList();
 
@@ -72,7 +72,7 @@ namespace DojoManagerApi
             using (var db = new DojoManagerContext())
             {
                 Console.WriteLine("Querying for all subjects afert closing db");
-                persons = db.Persons
+                persons = db.People
                     .Include(p => p.Certificates)
                     //.Include(p => p.Debits)
                     .Include(p => p.Subscriptions)
@@ -90,11 +90,11 @@ namespace DojoManagerApi
             throw new NotImplementedException(); 
         }
 
-        public IEnumerable<Person> ListPersons()
+        public IEnumerable<Person> ListPeople()
         {
             using (var sess = new DojoManagerContext())
             {
-                var persons = sess.Persons.ToList();
+                var persons = sess.People.ToList();
                 return persons;
             }
         }

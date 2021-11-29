@@ -21,7 +21,7 @@ namespace DojoManagerGui.ViewModels
         {
             FunctionPages = new ObservableCollection<VM_FunctionPage>()
             {
-                new VM_ListPersons(),
+                new VM_ListPeople(),
                 new VM_Subjects(),
                 new VM_MoneyMovements(null)
             };

@@ -35,13 +35,13 @@ namespace DojoManagerApi
         {
             var tester = new TestNHibernate();
             db.AddEntities(tester.InitialCashMovements.Select(m => EntityWrapper.Wrap(m)));
-            db.AddEntities(tester.InitialPersons);
+            db.AddEntities(tester.InitialPeople);
 
         }
 
         public TestContext TestContext { get; set; }
         private DateTime Date(int year, int month) => new DateTime(year, month, 01);
-        List<Person> InitialPersons;
+        List<Person> InitialPeople;
         List<MoneyMovement> InitialCashMovements;
         DbManager db;
         public TestNHibernate()
@@ -81,7 +81,7 @@ namespace DojoManagerApi
             p2.Subscriptions[1].Debit.AddPayment(360, p2.Subscriptions[1].StartDate.AddDays(1), p2.Origin);
 
             p2.AddCard(new MembershipCard() { CardId = "22222", Association = Associations[1], Invalidated = true });
-            InitialPersons = new() { p1, p2 };
+            InitialPeople = new() { p1, p2 };
 
             InitialCashMovements = new()
             {
@@ -126,7 +126,7 @@ namespace DojoManagerApi
 
             var persons = db.ListPeople();//.Select(p => EntityWrapper.Wrap(p) as Person).ToArray();
             Mod1(persons[0]);
-            Mod1(InitialPersons[0]);
+            Mod1(InitialPeople[0]);
 
             db.Save();
             db.Close();
@@ -145,7 +145,7 @@ namespace DojoManagerApi
             db.Load();
             var persons = db.ListPeople().Select(p => EntityWrapper.Wrap(p) as Person).ToArray();
             Mod1(persons[0]);
-            Mod1(InitialPersons[0]);
+            Mod1(InitialPeople[0]);
             db.Save();
             db.Close();
 
@@ -214,9 +214,9 @@ namespace DojoManagerApi
                 Console.WriteLine(p.PrintData());
             Assert.IsTrue(persons.Count == 2);
 
-            for (int i = 0; i < InitialPersons.Count; i++)
+            for (int i = 0; i < InitialPeople.Count; i++)
             {
-                var pi = InitialPersons[i];
+                var pi = InitialPeople[i];
                 var pn = persons[i];
 
                 Assert.AreEqual(pi.Address.City, pn.Address.City);
@@ -244,7 +244,7 @@ namespace DojoManagerApi
         public void Populate()
         {
             CreateInitialData();
-            db.AddEntities(InitialPersons.Cast<object>().Concat(InitialCashMovements));
+            db.AddEntities(InitialPeople.Cast<object>().Concat(InitialCashMovements));
         }
 
         public void PrintPersons()

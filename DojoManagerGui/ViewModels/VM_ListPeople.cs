@@ -9,7 +9,7 @@ using System;
 
 namespace DojoManagerGui.ViewModels
 {
-    public class VM_ListPersons : VM_FunctionPage, INotifyPropertyChanged
+    public class VM_ListPeople : VM_FunctionPage, INotifyPropertyChanged
     {
         private int? LastPersonSelectedId;
         private bool showMembers = true;
@@ -23,7 +23,7 @@ namespace DojoManagerGui.ViewModels
         public RelayCommand<VM_Person> RemovePersonCommand { get; }
         public string NameFilterString { get; set; }
 
-        public VM_ListPersons()
+        public VM_ListPeople()
         {
             RefreshPeople();
             PersonSelected = People?.FirstOrDefault();
@@ -33,7 +33,7 @@ namespace DojoManagerGui.ViewModels
             WeakReferenceMessenger.Default.Register<EntityListChangedMessage<Subject>>(this,
                 (r, a) =>
                 {
-                    VM_ListPersons rec = (VM_ListPersons)r;
+                    VM_ListPeople rec = (VM_ListPeople)r;
                     if (rec != a.Sender)
                         rec.RefreshPeople();
                 });
