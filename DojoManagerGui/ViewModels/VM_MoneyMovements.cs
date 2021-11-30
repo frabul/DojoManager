@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,6 +36,7 @@ namespace DojoManagerGui.ViewModels
         public RelayCommand<MoneyMovement> RemoveMovementCommand { get; }
         public RelayCommand AddNewMovementCommand { get; }
         public RelayCommand SearchCommand { get; }
+        public RelayCommand PrintMovementsCommand { get; }
         public DateTime? StartDateFilter { get => _StartDateFilter; set { _StartDateFilter = value; Refresh(); } }
         public DateTime? EndDateFilter { get => _EndDateFilter; set { _EndDateFilter = value; Refresh(); } }
         public string SubjectNameFilter { get; set; }
@@ -59,6 +61,8 @@ namespace DojoManagerGui.ViewModels
         }
         public VM_MoneyMovements(Subject subjectAssociated)
         {
+            StartDateFilter = new DateTime(DateTime.Now.Year, 1, 1);
+            EndDateFilter = new DateTime(DateTime.Now.Year + 1, 1, 1);
             SubjectAssociated = subjectAssociated;
             Movements = new ObservableCollection<MoneyMovement>();
             Refresh();
@@ -72,10 +76,10 @@ namespace DojoManagerGui.ViewModels
                     if (rec != a.Sender)
                         this.Refresh();
                 });
+            PrintMovementsCommand = new RelayCommand(PrintMovements);
             IsFiltersBoxVisible = subjectAssociated == null;
             IsAddAddButtonVisible = subjectAssociated != null;
         }
-
 
 
 
@@ -129,7 +133,7 @@ namespace DojoManagerGui.ViewModels
                         obj.Counterpart.Movements.Remove(obj);
                         App.Db.Delete(obj);
                         App.Db.Save();
-                   
+
                         WeakReferenceMessenger.Default.Send(
                             new EntityListChangedMessage<MoneyMovement>(this, Array.Empty<MoneyMovement>(), new MoneyMovement[] { obj }));
                     });
@@ -138,5 +142,109 @@ namespace DojoManagerGui.ViewModels
             }
         }
 
+        private void PrintMovements()
+        {
+            StringBuilder html = new StringBuilder();
+            HtmlTags.HtmlDocument doc = new HtmlTags.HtmlDocument();
+            doc.AddStyle(@"
+
+table {
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 0.9em;
+    font-family: sans-serif;
+    min-width: 800px;
+    max-width: 900px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+table thead tr {
+  max-width: 500px;
+  margin-left: 5px;
+  margin-right: auto;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+table thead tr {
+    background-color: #009879;
+    color: #ffffff;
+    text-align: left;
+}
+table th,
+table td {
+    padding: 12px 15px;
+    word-wrap: break-word;
+}
+
+table tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+table tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+}
+
+table tbody tr:last-of-type {
+    border-bottom: 2px solid #009879;
+} 
+");
+            doc.Head.Title($"Resoconto movimenti {Config.Instance.NomeAssociazione}");
+
+            doc.Body.Add($"Resoconto movimenti {Config.Instance.NomeAssociazione}");
+            //{ StartDateFilter: yyyy / MM / dd}
+            //{ EndDateFilter: yyyy / MM / dd}
+
+            var tabTotali = doc.Body.Add("table");
+            var hederRow = tabTotali.Add("thead").Add("tr");
+            hederRow.Add("th").Text("Tabella riassuntiva");
+             
+
+            if (StartDateFilter != null)
+            {
+                var tr = tabTotali.Add("tr");
+                tr.Add("td").Text("Inizio periodo riferimento");
+                tr.Add("td").Text($"{StartDateFilter:yyyy /MM/dd}");
+            }
+            if (StartDateFilter != null)
+            {
+                var tr = tabTotali.Add("tr");
+                tr.Add("td").Text("Fine periodo riferimento");
+                tr.Add("td").Text($"{EndDateFilter:yyyy/MM/dd}");
+            }
+
+            var r1 = tabTotali.Add("tr");
+            r1.Add("td").Text("Numero movimenti");
+            r1.Add("td").Text(MovementsCount.ToString());
+
+            var r2 = tabTotali.Add("tr");
+            r2.Add("td").Text("Totale entrate");
+            r2.Add("td").Text($"{Incomes:F2}€");
+
+            var r3 = tabTotali.Add("tr");
+            r3.Add("td").Text("Totale spese");
+            r3.Add("td").Text($"{Expenses:F2}€");
+
+            var r4 = tabTotali.Add("tr");
+            r4.Add("td").Text("Totale");
+            r4.Add("td").Text($"{MovementsTotal:F2}€");
+
+            var tab = doc.Body.Add("table");
+            hederRow = tab.Add("thead").Add("tr");
+            hederRow.Add("th").Text("Soggetto");
+            hederRow.Add("th").Text("Data");
+            hederRow.Add("th").Text("Somma");
+            hederRow.Add("th").Text("Note");
+            foreach (var mov in Movements)
+            {
+
+                var row = tab.Add("tr");
+                row.Add("td").Text(mov.Counterpart.FullName);
+                row.Add("td").Text(mov.Date.ToString("yyyy/MM/dd"));
+                row.Add("td").Text($"{mov.AmountSigned:F2}€");
+                row.Add("td").Text(mov.Notes);
+            }
+            var docDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            doc.WriteToFile(Path.Combine(docDir, "movements.html"));
+        }
     }
 }

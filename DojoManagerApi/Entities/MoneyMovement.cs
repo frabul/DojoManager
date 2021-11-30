@@ -11,6 +11,9 @@ namespace DojoManagerApi.Entities
         public virtual DateTime Date { get; set; } = DateTime.Now;
         public virtual MoneyMovementDirection Direction { get; set; }
         public virtual string Notes { get; set; }
+
+        [AutomapIgnore]
+        public virtual decimal AmountSigned => Direction == MoneyMovementDirection.In ? Amount : -Amount;
     }
 
     public enum MoneyMovementDirection { In, Out }

@@ -6,7 +6,7 @@
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"  
                  xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
                  xmlns:local="clr-namespace:DojoManagerGui"
-                 Title="DojoManager v.0.2"
+                 Title="DojoManager v.0.3"
                  Height="800"
                  Width="1400"
                  >
@@ -123,10 +123,22 @@
                     </GroupBox>
                 </DataTemplate>
                 <!--Template for VM_MoneyMovements-->
-                <DataTemplate DataType="{x:Type ViewModels:VM_MoneyMovements}"> 
-                    <GroupBox Header="Entrate/Uscite">
-                        <local:UC_MoneyMovements></local:UC_MoneyMovements>
-                    </GroupBox>
+                <DataTemplate DataType="{x:Type ViewModels:VM_MoneyMovements}">
+                    <Grid>
+                        
+                        <GroupBox Header="Entrate/Uscite">
+                            <local:UC_MoneyMovements></local:UC_MoneyMovements>
+                        </GroupBox>
+                        <Button Height="25" 
+                                Width="25" 
+                                Margin="110,1,1,1"
+                                HorizontalAlignment="Left" 
+                                VerticalAlignment="Top" 
+                                Content="{StaticResource PrintButton}"
+                                Command="{Binding PrintMovementsCommand}"
+                                > 
+                        </Button>
+                    </Grid>
                 </DataTemplate>
             </ContentControl.Resources>
         </ContentControl>

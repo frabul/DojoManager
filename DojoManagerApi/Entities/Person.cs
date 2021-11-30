@@ -25,7 +25,7 @@ namespace DojoManagerApi.Entities
         [AutomapIgnore]
         public virtual Person Origin => this;
         [AutomapIgnore]
-        public virtual string FullName => $"{Name} {SecondName}";
+        public override string FullName => $"{Name} {SecondName}";
 
         public virtual void RemoveCard(MembershipCard c)
         {
