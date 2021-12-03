@@ -22,19 +22,22 @@
             <Setter Property="TextAlignment"   Value="Center"></Setter>
         </Style>
     </mah:MetroWindow.Resources>
-    <!--<mah:MetroWindow.LeftWindowCommands>
+   <mah:MetroWindow.LeftWindowCommands>
         <mah:WindowCommands>
             <StackPanel Orientation="Horizontal">
-                <Button ToolTip="Save">
+                <Button 
+                    ToolTip="Backup"
+                    Command="{Binding BackupCommand}"
+                    >
                     <iconPacks:PackIconModern Kind="Save" /> 
                 </Button> 
             </StackPanel>
-           
+            <!--
             <Button ToolTip="Save">
                 <iconPacks:PackIconModern Kind="Disk" />
-            </Button>
+            </Button>-->
         </mah:WindowCommands>
-    </mah:MetroWindow.LeftWindowCommands>-->
+    </mah:MetroWindow.LeftWindowCommands>
 
     <Grid>
         <Grid.ColumnDefinitions>

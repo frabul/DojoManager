@@ -11,7 +11,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.IO.Compression;
 namespace DojoManagerApi
 {
     public class DbManager
@@ -67,7 +67,6 @@ namespace DojoManagerApi
             {
                 if (CurrentSession.IsDirty())
                 {
-                    CreateBackUp();
                     CurrentSession.Flush();
                 }
             });
@@ -79,9 +78,24 @@ namespace DojoManagerApi
             return q.ToList();
         }
 
-        private void CreateBackUp()
+        public void CreateBackUp(string outFilePath)
         {
-            //TODO
+            ExecuteWithSession(() =>
+            {
+                if (CurrentSession.IsDirty())
+                    CurrentSession.Flush();
+                //zip all files
+                using FileStream zipFile = File.Open(outFilePath, FileMode.Create);
+                ZipArchive archive = new ZipArchive(zipFile, ZipArchiveMode.Create);
+                foreach (var fi in Directory.GetFiles(DbRoot).Concat(Directory.GetFiles(ImagesDir)))
+                {
+                    var fileName = Path.GetFileName(fi);
+                    var fileDir = Path.GetDirectoryName(fi);
+                    var entryPath = Path.GetRelativePath(DbRoot, fi);
+                    archive.CreateEntryFromFile(fi, entryPath );
+                }
+                archive.Dispose();
+            });
         }
 
 
@@ -225,10 +239,10 @@ namespace DojoManagerApi
                                 .OrderByDescending(c => c.NumberInYear)
                                 .Take(1)
                                 .FirstOrDefault();
-                if (lastRec != null) 
-                    receipt.NumberInYear = lastRec.NumberInYear + 1; 
-                else 
-                    receipt.NumberInYear = 1;  
+                if (lastRec != null)
+                    receipt.NumberInYear = lastRec.NumberInYear + 1;
+                else
+                    receipt.NumberInYear = 1;
             });
         }
 
@@ -358,6 +372,6 @@ namespace DojoManagerApi
                 throw new Exception("No session.");
         }
 
-       
+
     }
 }

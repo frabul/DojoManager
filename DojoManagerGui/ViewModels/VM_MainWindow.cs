@@ -1,4 +1,5 @@
 ﻿using DojoManagerApi;
+using Microsoft.Toolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -16,7 +17,7 @@ namespace DojoManagerGui.ViewModels
         public ObservableCollection<VM_FunctionPage> FunctionPages { get; set; } = new ObservableCollection<VM_FunctionPage>();
 
         public VM_FunctionPage FunctionSelected { get; set; }
-
+        public RelayCommand BackupCommand { get; }
         public VM_MainWindow()
         {
             FunctionPages = new ObservableCollection<VM_FunctionPage>()
@@ -26,6 +27,13 @@ namespace DojoManagerGui.ViewModels
                 new VM_MoneyMovements(null)
             };
             FunctionSelected = FunctionPages[0];
+            BackupCommand = new RelayCommand(BackupAsync);
+        }
+        public async void BackupAsync()
+        {
+            var fileName = await App.SelectBackupFile();
+            if(fileName != null) 
+                App.Db.CreateBackUp(fileName);
         }
     }
 }

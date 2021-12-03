@@ -16,6 +16,7 @@ using Microsoft.Win32;
 using System.Diagnostics;
 using Gehtsoft.PDFFlow.Builder;
 using Gehtsoft.PDFFlow.Models.Shared;
+using System.IO;
 
 namespace DojoManagerGui
 {
@@ -26,21 +27,21 @@ namespace DojoManagerGui
     {
         public static DojoManagerApi.DbManager Db;
 
-        public static string ClubName { get; set; } = "Ken Sei Dojo";
+        public static string ClubName => Config.Instance.NomeAssociazione;
         private DispatcherTimer SaveTimer;
         private static Window_Main MainWindow;
 
         protected override void OnStartup(StartupEventArgs e)
         {
             //PdfTest.Test();
-   
+
 
             Db = new DojoManagerApi.DbManager(Config.Instance.DbName, Config.Instance.DbLocation);
             //Db.ClearDatabase();
             Db.Load();
             //TestNHibernate.PopulateDb(Db);
             //Db.Save();
-
+            Db.CreateBackUp(Path.Combine(Db.BackupsDir, $"{Config.Instance.DbName}_backup_{DateTime.Now.ToString("yyyyMMddHHmmss")}.zip"));
 
             SaveTimer = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(250) };
             SaveTimer.Tick += (s, e) =>
@@ -65,7 +66,7 @@ namespace DojoManagerGui
         public static async Task AskAndExecuteAsync(Action act)
         {
             var res = await App.ShowMessage(
-                "Attenzione", 
+                "Attenzione",
                 "Sei sicuro di voler rimuovere l'oggetto?",
                 MahApps.Metro.Controls.Dialogs.MessageDialogStyle.AffirmativeAndNegative);
             if (res == MahApps.Metro.Controls.Dialogs.MessageDialogResult.Affirmative)
@@ -85,6 +86,37 @@ namespace DojoManagerGui
                 return selectedFile;
             }
             return null;
+        }
+
+        public static async Task<string?> SelectBackupFile()
+        {
+            OpenFileDialog openFileDialog = new();
+            openFileDialog.Multiselect = false;
+            openFileDialog.AddExtension = true;
+            openFileDialog.CheckFileExists = false;
+            openFileDialog.CheckPathExists = true;
+            openFileDialog.Filter = "Zip files (*.zip) | *.zip";
+            openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            openFileDialog.Title = "Select backup file name";
+            var res = openFileDialog.ShowDialog() == true;
+            if (res)
+            {
+
+                if (File.Exists(openFileDialog.FileName))
+                {
+                    var dialogResult = await App.ShowMessage(
+                        "Attenzione",
+                        "File già esistente, vuoi sovrascriverlo?",
+                         MessageDialogStyle.AffirmativeAndNegative);
+                    res = dialogResult == MessageDialogResult.Affirmative;
+                }
+
+
+            }
+            if (res)
+                return openFileDialog.FileName;
+            else
+                return null;
         }
     }
 }
