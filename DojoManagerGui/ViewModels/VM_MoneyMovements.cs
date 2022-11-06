@@ -61,8 +61,8 @@ namespace DojoManagerGui.ViewModels
         }
         public VM_MoneyMovements(Subject subjectAssociated)
         {
-            StartDateFilter = new DateTime(DateTime.Now.Year, 1, 1);
-            EndDateFilter = new DateTime(DateTime.Now.Year + 1, 1, 1);
+            StartDateFilter = DateTime.MinValue; // new DateTime(DateTime.Now.Year - 20, 1, 1);
+            EndDateFilter = DateTime.MaxValue; // new DateTime(DateTime.Now.Year + 1, 1, 1);
             SubjectAssociated = subjectAssociated;
             Movements = new ObservableCollection<MoneyMovement>();
             Refresh();
