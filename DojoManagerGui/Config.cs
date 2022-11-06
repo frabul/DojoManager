@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -50,7 +51,11 @@ namespace DojoManagerGui
                 return Newtonsoft.Json.JsonConvert.DeserializeObject<Config>(File.ReadAllText(ConfigFileName));
             }
             else
-                return new Config();
+            {
+                var conf = new Config();
+                File.WriteAllText(ConfigFileName, JsonConvert.SerializeObject(conf, Formatting.Indented));
+                return conf;
+            }
         }
 
     }

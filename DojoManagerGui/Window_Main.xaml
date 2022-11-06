@@ -6,7 +6,7 @@
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"  
                  xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
                  xmlns:local="clr-namespace:DojoManagerGui"
-                 Title="DojoManager v.0.3"
+                 Title="DojoManager 1.0"
                  Height="800"
                  Width="1400"
                  >

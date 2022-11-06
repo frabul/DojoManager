@@ -1,4 +1,5 @@
 ﻿using DojoManagerApi.Entities;
+using Microsoft.AspNetCore.Components;
 using Microsoft.Toolkit.Mvvm.Input;
 using Microsoft.Win32;
 using System;
@@ -31,8 +32,18 @@ namespace DojoManagerGui.ViewModels
             var selectedFile = App.SelectImage();
             if (selectedFile != null)
             {
-                App.Db.SetImage(Certificate, selectedFile);
-                ImageFilePath = App.Db.GetImagePath(Certificate);
+                ImageFilePath = null;
+                
+                App.Current.Dispatcher.InvokeAsync(( ) =>
+                {
+                    try 
+                    { 
+                        App.Db.SetImage(Certificate, selectedFile);
+                        ImageFilePath = App.Db.GetImagePath(Certificate);
+                    }
+                    catch(Exception ex) { } 
+                });
+               
             }
 
 

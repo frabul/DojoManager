@@ -87,7 +87,19 @@ namespace DojoManagerGui
             }
             return null;
         }
-
+        public static string? SelectFile()
+        {
+            OpenFileDialog openFileDialog = new();
+            openFileDialog.Multiselect = false;
+            openFileDialog.Filter = "All files (*.*) | *.*";
+            openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+            if (openFileDialog.ShowDialog() == true)
+            {
+                var selectedFile = openFileDialog.FileName;
+                return selectedFile;
+            }
+            return null;
+        }
         public static async Task<string?> SelectBackupFile()
         {
             OpenFileDialog openFileDialog = new();

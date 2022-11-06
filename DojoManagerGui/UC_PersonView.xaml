@@ -345,11 +345,17 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
+                            
                             <DataGridTemplateColumn Header="Immagine">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button Command="{Binding Path=DataContext.ShowCertificateImageCommand, ElementName=root }"
-                                            CommandParameter="{Binding .}">...</Button>
+                                        <StackPanel Orientation="Horizontal">
+
+                                            <Button Command="{Binding Path=DataContext.ShowCertificateImageCommand, ElementName=root }"
+                                                CommandParameter="{Binding .}">Vedi</Button>
+                                            <Button Command="{Binding Path=DataContext.SetCertificateImageCommand, ElementName=root }"
+                                                CommandParameter="{Binding .}">Imposta</Button>
+                                        </StackPanel>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>

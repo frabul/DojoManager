@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.IO;
 using Microsoft.Toolkit.Mvvm.Messaging;
+using System.Diagnostics;
 
 namespace DojoManagerGui.ViewModels
 {
@@ -78,6 +79,7 @@ namespace DojoManagerGui.ViewModels
 
             });
             ShowCertificateImageCommand = new RelayCommand<Certificate>(ShowCertificateImage);
+            SetCertificateImageCommand = new RelayCommand<Certificate>(SetCertificateImage);
             AddSubscriptionCommand = new RelayCommand(
                     () => Person.AddSubscription(new Subscription() { StartDate = DateTime.Now, EndDate = DateTime.Now }, 0),
                     () => Person != null);
@@ -194,6 +196,7 @@ namespace DojoManagerGui.ViewModels
         public RelayCommand AddNewCertificate { get; }
         public RelayCommand<Certificate> RemoveCertificate { get; }
         public RelayCommand<Certificate> ShowCertificateImageCommand { get; }
+        public RelayCommand<Certificate> SetCertificateImageCommand { get; }
         public RelayCommand<DebitPayment> RemovePaymentCommand { get; }
         public RelayCommand AddExaminationCommand { get; }
         public RelayCommand<KendoExamination> RemoveExaminationCommand { get; }
@@ -241,11 +244,45 @@ namespace DojoManagerGui.ViewModels
 
         public void ShowCertificateImage(Certificate cert)
         {
-            var vm = new VM_ImageViewer(cert);
-            var win = new Window_ImageViewer() { DataContext = vm };
-            win.ShowDialog();
-            cert.ImageFileName = vm.ImageFilePath;
+            if (cert.ImageFileName == null)
+                return;
+            if (!File.Exists(cert.ImageFileName))
+            {
+                // todo log problem
+                return;
+            }
+            
+            var temp = Path.Combine(
+                Path.GetTempPath(),
+                //Path.GetFileName(cert.ImageFileName)
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
+                );
+            try
+            {
+                File.Copy(cert.ImageFileName, temp, true);
+                new Process
+                {
+                    StartInfo = new ProcessStartInfo(temp)
+                    {
+                        UseShellExecute = true
+                    }
+                }.Start();
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+
         }
+
+        public void SetCertificateImage(Certificate cert)
+        {
+            var selectedFile = App.SelectImage();
+            App.Db.SetImage(cert, selectedFile);
+            cert.ImageFileName = App.Db.GetImagePath(cert);
+        }
+
         private void AssignNewCode(MembershipCard? card)
         {
             if (card == null || string.IsNullOrEmpty(card.Association))
@@ -287,10 +324,10 @@ namespace DojoManagerGui.ViewModels
             try
             {
                 var targetDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                var targetFileName = $"Ricevuta_KSD_{numRicevuta}.docx".Replace("/","-");
+                var targetFileName = $"Ricevuta_KSD_{numRicevuta}.docx".Replace("/", "-");
                 DocTemplateCompiler.Compile(
-                    "RicevutaKSD.docx", 
-                    Path.Combine(targetDir,targetFileName), 
+                    "RicevutaKSD.docx",
+                    Path.Combine(targetDir, targetFileName),
                     variables);
             }
             catch (Exception ex)
@@ -351,7 +388,7 @@ namespace DojoManagerGui.ViewModels
                 }
 
             }
-         
+
             variables.Add("data_rec", "");
             try
             {
