@@ -180,7 +180,7 @@ namespace DojoManagerApi
             {
                 string extension = Path.GetExtension(filePath);
                 var n = certificate.Person.Name.Replace(' ', '_');
-                var destFileName = $"Certificate_{n}_{certificate.Id}.{extension}";
+                var destFileName = $"Certificate_{n}_{certificate.Id}{extension}";
                 var finalImagePath = Path.Combine(ImagesDir, destFileName);
                 File.Copy(filePath, finalImagePath, true);
                 imageFileName = Path.GetFileName(finalImagePath);

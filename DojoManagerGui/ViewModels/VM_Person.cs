@@ -246,20 +246,21 @@ namespace DojoManagerGui.ViewModels
         {
             if (cert.ImageFileName == null)
                 return;
-            if (!File.Exists(cert.ImageFileName))
+            var filePath = App.Db.GetImagePath(cert);
+            if (!File.Exists(filePath))
             {
                 // todo log problem
                 return;
             }
-            
+
             var temp = Path.Combine(
                 Path.GetTempPath(),
-                //Path.GetFileName(cert.ImageFileName)
-                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                cert.ImageFileName 
                 );
             try
             {
-                File.Copy(cert.ImageFileName, temp, true);
+                File.Copy(filePath, temp, true);
                 new Process
                 {
                     StartInfo = new ProcessStartInfo(temp)
@@ -278,9 +279,13 @@ namespace DojoManagerGui.ViewModels
 
         public void SetCertificateImage(Certificate cert)
         {
-            var selectedFile = App.SelectImage();
-            App.Db.SetImage(cert, selectedFile);
-            cert.ImageFileName = App.Db.GetImagePath(cert);
+            var selectedFile = App.SelectFile();
+            if (selectedFile != null)
+            {
+                App.Db.SetImage(cert, selectedFile);
+                //cert.ImageFileName = App.Db.GetImagePath(cert); 
+            }
+
         }
 
         private void AssignNewCode(MembershipCard? card)
