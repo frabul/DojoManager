@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\FluentIL\src\FluentIL\FluentIL.csproj" />
+    <ProjectReference Include="..\FluentIL\src\FluentIL\FluentIL.csproj" />
   </ItemGroup>
 
 </Project>

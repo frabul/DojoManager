@@ -1,0 +1,3 @@
+[submodule "FluentIL"]
+	path = FluentIL
+	url = https://github.com/frabul/FluentIL.git

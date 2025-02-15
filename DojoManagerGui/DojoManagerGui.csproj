@@ -17,8 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\FluentIL\src\FluentIL\FluentIL.csproj" />
     <ProjectReference Include="..\DojoManagerApi\DojoManagerApi.csproj" />
+    <ProjectReference Include="..\FluentIL\src\FluentIL\FluentIL.csproj" />
   </ItemGroup>
 
   <ItemGroup>

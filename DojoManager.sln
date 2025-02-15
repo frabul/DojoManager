@@ -7,9 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DojoManagerApi", "DojoManag
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DojoManagerGui", "DojoManagerGui\DojoManagerGui.csproj", "{C91CEEED-6CA7-443F-9E54-E3610217FF53}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentIL", "..\FluentIL\src\FluentIL\FluentIL.csproj", "{371D6B69-3983-47F5-A215-A9EA51D116EA}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestConsole", "TestConsole\TestConsole.csproj", "{3C93182D-FF0E-417F-BFB7-8953223EF460}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentIL", "FluentIL\src\FluentIL\FluentIL.csproj", "{BF8986FF-FDBF-479F-B5C7-A4A34E576061}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,14 +35,6 @@ Global
 		{C91CEEED-6CA7-443F-9E54-E3610217FF53}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C91CEEED-6CA7-443F-9E54-E3610217FF53}.Release|x86.ActiveCfg = Release|x86
 		{C91CEEED-6CA7-443F-9E54-E3610217FF53}.Release|x86.Build.0 = Release|x86
-		{371D6B69-3983-47F5-A215-A9EA51D116EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{371D6B69-3983-47F5-A215-A9EA51D116EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{371D6B69-3983-47F5-A215-A9EA51D116EA}.Debug|x86.ActiveCfg = Debug|x86
-		{371D6B69-3983-47F5-A215-A9EA51D116EA}.Debug|x86.Build.0 = Debug|x86
-		{371D6B69-3983-47F5-A215-A9EA51D116EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{371D6B69-3983-47F5-A215-A9EA51D116EA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{371D6B69-3983-47F5-A215-A9EA51D116EA}.Release|x86.ActiveCfg = Release|x86
-		{371D6B69-3983-47F5-A215-A9EA51D116EA}.Release|x86.Build.0 = Release|x86
 		{3C93182D-FF0E-417F-BFB7-8953223EF460}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3C93182D-FF0E-417F-BFB7-8953223EF460}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C93182D-FF0E-417F-BFB7-8953223EF460}.Debug|x86.ActiveCfg = Debug|x86
@@ -51,6 +43,14 @@ Global
 		{3C93182D-FF0E-417F-BFB7-8953223EF460}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3C93182D-FF0E-417F-BFB7-8953223EF460}.Release|x86.ActiveCfg = Release|x86
 		{3C93182D-FF0E-417F-BFB7-8953223EF460}.Release|x86.Build.0 = Release|x86
+		{BF8986FF-FDBF-479F-B5C7-A4A34E576061}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF8986FF-FDBF-479F-B5C7-A4A34E576061}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF8986FF-FDBF-479F-B5C7-A4A34E576061}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BF8986FF-FDBF-479F-B5C7-A4A34E576061}.Debug|x86.Build.0 = Debug|Any CPU
+		{BF8986FF-FDBF-479F-B5C7-A4A34E576061}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF8986FF-FDBF-479F-B5C7-A4A34E576061}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF8986FF-FDBF-479F-B5C7-A4A34E576061}.Release|x86.ActiveCfg = Release|Any CPU
+		{BF8986FF-FDBF-479F-B5C7-A4A34E576061}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
