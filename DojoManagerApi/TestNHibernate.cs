@@ -26,7 +26,7 @@ namespace DojoManagerApi
 
         string[] SubscriptionTypes = new string[] { 
             "Ken Sei Dojo - quota associativa (aaaa/aaaa)",
-            "CIK - quota associativa (aaaa/aaaa)"
+            "CIK - quota associativa (aaaa)"
         };
         string[] Associations = new string[] { "Ken Sei Dojo", "CIK" };
         public const string DbFile = "KenseiDojoDb.db";
