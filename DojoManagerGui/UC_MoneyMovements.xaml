@@ -93,7 +93,7 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="Soggetto" Binding="{Binding Counterpart.Name}" IsReadOnly="True"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Soggetto" Binding="{Binding Counterpart.FullName}" IsReadOnly="True"></DataGridTextColumn>
                             <DataGridTemplateColumn Header="Data" SortMemberPath="Date" >
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>

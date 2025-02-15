@@ -65,7 +65,7 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTextColumn IsReadOnly="True" Header="Nome" >
+                    <DataGridTextColumn IsReadOnly="True" Header="Nome" SortMemberPath="Person.Name">
                         <DataGridTextColumn.Binding>
                             <MultiBinding StringFormat="{}{0} {1}">
                                 <Binding Path="Person.Name" />
