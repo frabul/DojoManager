@@ -8,7 +8,7 @@
     <ApplicationIcon>screenshot_2021_10_29_164627_Eek_icon.ico</ApplicationIcon>
     <Platforms>AnyCPU;x86</Platforms>
     <Authors>Francesco Buldo</Authors>
-    <Version>0.3</Version>
+    <Version>1.2</Version>
     <Copyright>Francesco Buldo</Copyright>
   </PropertyGroup>
 
