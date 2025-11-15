@@ -14,7 +14,12 @@ namespace DojoManagerApi.Entities
         public virtual string PhoneNumber { get; set; }
         public virtual string Notes { get; set; }
         [AutomapIgnore]
-        public virtual string FullName => Name;
+        public virtual string FullName
+        {
+            get => Name;
+            set => Name = value;
+        }
+
         public virtual IList<MoneyMovement> Movements { get; set; } = new List<MoneyMovement>();
     }
 }

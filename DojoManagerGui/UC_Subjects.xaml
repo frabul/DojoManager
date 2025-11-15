@@ -66,7 +66,9 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Header="Nome" Binding="{Binding FullName}"></DataGridTextColumn>
+                <local:SafeDataGridTextColumn Header="Nome" Binding="{Binding FullName}">
+                    
+                </local:SafeDataGridTextColumn>
                 <DataGridTextColumn Header="EMail" Binding="{Binding EMail}"></DataGridTextColumn>
                 <DataGridTextColumn Header="Tel." Binding="{Binding PhoneNumber}"></DataGridTextColumn>
                 <DataGridTextColumn Header="Città" Binding="{Binding Address.City}"></DataGridTextColumn>
